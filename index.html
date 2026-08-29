@@ -2,1253 +2,922 @@
 <html lang="en">
 
 <head>
-
-<meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>
-KIMS - Kemiko Invoice Management System
-</title>
-
-
-<script
-src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-</script>
-
-
-<style>
-
-* {
-    box-sizing: border-box;
-}
-
-
-body {
-
-    margin: 0;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    background: #f4f6f8;
-
-    color: #222;
-}
-
-
-/* =========================================================
-   LOGIN
-   ========================================================= */
-
-#login-page {
-
-    min-height: 100vh;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 20px;
-}
-
-
-.login-box {
-
-    width: 100%;
-
-    max-width: 400px;
-
-    background: white;
-
-    padding: 35px;
-
-    border-radius: 14px;
-
-    box-shadow:
-        0 5px 25px
-        rgba(0,0,0,.12);
-}
-
-
-.login-box h1 {
-
-    text-align: center;
-
-    margin: 0;
-
-    font-size: 32px;
-}
-
-
-.subtitle {
-
-    text-align: center;
-
-    color: #666;
-
-    margin:
-        8px 0 25px;
-}
-
-
-/* =========================================================
-   INPUTS
-   ========================================================= */
-
-input,
-select {
-
-    width: 100%;
-
-    padding:
-        12px 14px;
-
-    margin-top: 7px;
-
-    margin-bottom: 15px;
-
-    border:
-        1px solid #ccc;
-
-    border-radius: 7px;
-
-    font-size: 15px;
-
-    background: white;
-}
-
-
-input:focus,
-select:focus {
-
-    outline: none;
-
-    border-color: #1667d9;
-
-    box-shadow:
-        0 0 0 2px
-        rgba(22,103,217,.1);
-}
-
-
-button {
-
-    border: none;
-
-    border-radius: 7px;
-
-    padding:
-        10px 16px;
-
-    cursor: pointer;
-
-    font-size: 14px;
-
-    font-weight: 600;
-}
-
-
-.primary-btn {
-
-    background: #1667d9;
-
-    color: white;
-
-    width: 100%;
-
-    padding: 13px;
-
-    font-size: 16px;
-}
-
-
-.primary-btn:hover {
-
-    background: #0f56bb;
-}
-
-
-/* =========================================================
-   APP
-   ========================================================= */
-
-#app-page {
-
-    display: none;
-
-    min-height: 100vh;
-}
-
-
-header {
-
-    background: white;
-
-    border-bottom:
-        1px solid #ddd;
-
-    padding:
-        16px 25px;
-
-    display: flex;
-
-    justify-content:
-        space-between;
-
-    align-items: center;
-}
-
-
-header h2 {
-
-    margin: 0;
-
-    color: #1667d9;
-}
-
-
-.logout-btn {
-
-    background: #d9534f;
-
-    color: white;
-}
-
-
-/* =========================================================
-   NAVIGATION
-   ========================================================= */
-
-.navbar {
-
-    background: #1667d9;
-
-    padding:
-        10px 25px;
-
-    display: flex;
-
-    gap: 8px;
-
-    flex-wrap: wrap;
-}
-
-
-.nav-btn {
-
-    background:
-        rgba(255,255,255,.15);
-
-    color: white;
-
-    padding:
-        10px 18px;
-}
-
-
-.nav-btn:hover {
-
-    background:
-        rgba(255,255,255,.25);
-}
-
-
-/* =========================================================
-   CONTAINER
-   ========================================================= */
-
-.container {
-
-    max-width: 1400px;
-
-    margin: auto;
-
-    padding: 25px;
-}
-
-
-/* =========================================================
-   PAGE HEADER
-   ========================================================= */
-
-.page-header {
-
-    display: flex;
-
-    justify-content:
-        space-between;
-
-    align-items: center;
-
-    margin-bottom: 20px;
-}
-
-
-.page-header h1 {
-
-    margin: 0;
-
-    font-size: 28px;
-}
-
-
-/* =========================================================
-   CARD
-   ========================================================= */
-
-.card {
-
-    background: white;
-
-    border-radius: 10px;
-
-    padding: 22px;
-
-    margin-bottom: 25px;
-
-    box-shadow:
-        0 2px 10px
-        rgba(0,0,0,.07);
-}
-
-
-.card h2 {
-
-    margin-top: 0;
-
-    margin-bottom: 20px;
-}
-
-
-/* =========================================================
-   FORM
-   ========================================================= */
-
-.form-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
-    gap:
-        0 20px;
-}
-
-
-.form-group label {
-
-    font-weight: 600;
-
-    font-size: 14px;
-}
-
-
-.form-actions {
-
-    margin-top: 5px;
-
-    display: flex;
-
-    gap: 10px;
-
-    flex-wrap: wrap;
-}
-
-
-#save-representative-btn,
-#save-customer-btn {
-
-    background: #1667d9;
-
-    color: white;
-}
-
-
-#cancel-edit-btn,
-#cancel-customer-edit-btn {
-
-    background: #777;
-
-    color: white;
-
-    display: none;
-}
-
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
-
-.search-box {
-
-    margin-bottom: 18px;
-}
-
-
-.search-box input {
-
-    margin: 0;
-
-    max-width: 500px;
-}
-
-
-/* =========================================================
-   TABLE
-   ========================================================= */
-
-.table-wrapper {
-
-    overflow-x: auto;
-}
-
-
-table {
-
-    width: 100%;
-
-    border-collapse:
-        collapse;
-
-    min-width: 800px;
-}
-
-
-th {
-
-    background:
-        #f0f2f5;
-
-    text-align: left;
-
-    padding: 13px;
-
-    border-bottom:
-        1px solid #ddd;
-
-    font-size: 14px;
-}
-
-
-td {
-
-    padding: 13px;
-
-    border-bottom:
-        1px solid #eee;
-
-    font-size: 14px;
-}
-
-
-tr:hover td {
-
-    background:
-        #fafafa;
-}
-
-
-.actions {
-
-    white-space:
-        nowrap;
-}
-
-
-.edit-btn {
-
-    background:
-        #f0ad4e;
-
-    color: white;
-
-    margin-right: 5px;
-}
-
-
-.delete-btn {
-
-    background:
-        #d9534f;
-
-    color: white;
-}
-
-
-.empty {
-
-    text-align: center;
-
-    color: #777;
-
-    padding: 30px;
-}
-
-
-/* =========================================================
-   CUSTOMER PAGE
-   ========================================================= */
-
-#customers-page {
-
-    display: none;
-}
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 700px) {
-
-    header {
-
-        padding:
-            14px 16px;
-    }
-
-
-    .navbar {
-
-        padding:
-            10px 15px;
-    }
-
-
-    .container {
-
-        padding: 15px;
-    }
-
-
-    .form-grid {
-
-        grid-template-columns:
-            1fr;
-    }
-
-
-    .page-header {
-
-        align-items:
-            flex-start;
-
-        flex-direction:
-            column;
-
-        gap: 8px;
-    }
-
-
-    .card {
-
-        padding: 16px;
-    }
-
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KIMS - Kemiko Invoice Management System</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            color: #222;
+        }
+
+        .header {
+            background: #17365d;
+            color: white;
+            padding: 18px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .logout-btn {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .navbar {
+            background: white;
+            padding: 12px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            border: none;
+            background: #e9eef5;
+            padding: 10px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .nav-btn:hover {
+            background: #d7e2f0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #17365d;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .button-row {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .primary-btn {
+            background: #17365d;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+        }
+
+        .secondary-btn {
+            background: #777;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+        }
+
+        .edit-btn {
+            background: #e0a800;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        .delete-btn {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: #17365d;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 9px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .actions {
+            white-space: nowrap;
+        }
+
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f0f3f8;
+        }
+
+        .login-box {
+            background: white;
+            width: 380px;
+            max-width: 90%;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .login-box h1 {
+            text-align: center;
+            color: #17365d;
+        }
+
+        .login-box input {
+            margin-bottom: 12px;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: #17365d;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .message {
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 800px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 
 
 <body>
 
 
-<!-- =======================================================
+<!-- =====================================================
      LOGIN
-     ======================================================= -->
+===================================================== -->
 
-<div id="login-page">
+<div id="loginScreen" class="login-screen">
 
     <div class="login-box">
 
         <h1>KIMS</h1>
 
-        <p class="subtitle">
+        <p style="text-align:center;">
             Kemiko Invoice Management System
         </p>
 
-
         <input
+            id="loginEmail"
             type="email"
-            id="email"
             placeholder="Email"
         >
 
-
         <input
+            id="loginPassword"
             type="password"
-            id="password"
             placeholder="Password"
         >
 
-
         <button
-            class="primary-btn"
-            onclick="handleLogin()"
+            class="login-btn"
+            onclick="loginUser()"
         >
             Login
         </button>
 
-
-        <p id="login-error"></p>
-
-    </div>
-
-</div>
-
-
-<!-- =======================================================
-     APPLICATION
-     ======================================================= -->
-
-<div id="app-page">
-
-
-<header>
-
-    <h2>
-        KIMS
-    </h2>
-
-
-    <button
-        class="logout-btn"
-        onclick="logout()"
-    >
-        Logout
-    </button>
-
-</header>
-
-
-<!-- =======================================================
-     NAVIGATION
-     ======================================================= -->
-
-<nav class="navbar">
-
-    <button
-        class="nav-btn"
-        onclick="showPage('representatives')"
-    >
-        Representatives
-    </button>
-
-    <button
-        class="nav-btn"
-        onclick="showPage('customers')"
-    >
-        Customers
-    </button>
-
-    <button
-        class="nav-btn"
-        onclick="showPage('products')"
-    >
-        Products
-    </button>
-
-</nav>
-
-
-<main class="container">
-
-
-<!-- =======================================================
-     REPRESENTATIVES
-     ======================================================= -->
-
-<section
-    id="representatives-page"
->
-
-
-<div class="page-header">
-
-    <h1>
-        Representatives
-    </h1>
-
-</div>
-
-
-<div class="card">
-
-    <h2>
-        Add / Edit Representative
-    </h2>
-
-
-    <div class="form-grid">
-
-
-        <div class="form-group">
-
-            <label>
-                Representative Code *
-            </label>
-
-            <input
-                type="text"
-                id="rep-code"
-                placeholder="Example: SYL-117"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Representative Name *
-            </label>
-
-            <input
-                type="text"
-                id="rep-name"
-                placeholder="Example: Abdul Bari"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Territory Code
-            </label>
-
-            <input
-                type="text"
-                id="territory-code"
-                placeholder="Example: SYL"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Territory Name
-            </label>
-
-            <input
-                type="text"
-                id="territory-name"
-                placeholder="Example: Sylhet"
-            >
-
-        </div>
-
-
-    </div>
-
-
-    <div class="form-actions">
-
-        <button
-            id="save-representative-btn"
-            onclick="saveRepresentative()"
-        >
-            Create Representative
-        </button>
-
-
-        <button
-            id="cancel-edit-btn"
-            onclick="clearRepresentativeForm()"
-        >
-            Cancel
-        </button>
+        <div
+            id="loginMessage"
+            class="message"
+        ></div>
 
     </div>
 
 </div>
 
-
-<div class="card">
-
-    <h2>
-        Representative List
-    </h2>
-
-
-    <div class="search-box">
-
-        <input
-            type="text"
-            id="representative-search"
-            placeholder="Search code, name or territory..."
-        >
-
-    </div>
-
-
-    <div class="table-wrapper">
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Representative Code
-                    </th>
-
-                    <th>
-                        Representative Name
-                    </th>
-
-                    <th>
-                        Territory Code
-                    </th>
-
-                    <th>
-                        Territory Name
-                    </th>
-
-                    <th>
-                        Actions
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody
-                id="representatives-table-body"
-            >
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
-
-</section>
-
-
-<!-- =======================================================
-     CUSTOMERS
-     ======================================================= -->
-
-<section
-    id="customers-page"
->
-
-
-<div class="page-header">
-
-    <h1>
-        Customers
-    </h1>
-
-</div>
-
-
-<div class="card">
-
-    <h2>
-        Add / Edit Customer
-    </h2>
-
-
-    <div class="form-grid">
-
-
-        <div class="form-group">
-
-            <label>
-                Customer Code *
-            </label>
-
-            <input
-                type="text"
-                id="customer-code"
-                placeholder="Example: CUS-001"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Shop Name *
-            </label>
-
-            <input
-                type="text"
-                id="shop-name"
-                placeholder="Example: Maa Pharmacy"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Address
-            </label>
-
-            <input
-                type="text"
-                id="customer-address"
-                placeholder="Customer address"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Owner Name
-            </label>
-
-            <input
-                type="text"
-                id="owner-name"
-                placeholder="Owner name"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Mobile
-            </label>
-
-            <input
-                type="text"
-                id="customer-mobile"
-                placeholder="Mobile number"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Email
-            </label>
-
-            <input
-                type="email"
-                id="customer-email"
-                placeholder="Email address"
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Representative *
-            </label>
-
-            <select
-                id="customer-representative"
-            >
-
-                <option value="">
-                    Select Representative
-                </option>
-
-            </select>
-
-        </div>
-
-
-    </div>
-
-
-    <div class="form-actions">
-
-        <button
-            id="save-customer-btn"
-            onclick="saveCustomer()"
-        >
-            Create Customer
-        </button>
-
-
-        <button
-            id="cancel-customer-edit-btn"
-            onclick="clearCustomerForm()"
-        >
-            Cancel
-        </button>
-
-    </div>
-
-</div>
-
-
-<div class="card">
-
-    <h2>
-        Customer List
-    </h2>
-
-
-    <div class="search-box">
-
-        <input
-            type="text"
-            id="customer-search"
-            placeholder="Search code, shop, owner, mobile or representative..."
-        >
-
-    </div>
-
-
-    <div class="table-wrapper">
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Customer Code
-                    </th>
-
-                    <th>
-                        Shop Name
-                    </th>
-
-                    <th>
-                        Address
-                    </th>
-
-                    <th>
-                        Owner
-                    </th>
-
-                    <th>
-                        Mobile
-                    </th>
-
-                    <th>
-                        Email
-                    </th>
-
-                    <th>
-                        Representative
-                    </th>
-
-                    <th>
-                        Actions
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody
-                id="customers-table-body"
-            >
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
-
-</section>
-
-
-</main>
-
-</div>
-
-
-<!-- =======================================================
-     LOGIN SCRIPT
-     ======================================================= -->
-
-<script>
-
-async function handleLogin() {
-
-    const email =
-        document
-            .getElementById("email")
-            .value
-            .trim();
-
-
-    const password =
-        document
-            .getElementById("password")
-            .value;
-
-
-    const error =
-        document
-            .getElementById(
-                "login-error"
-            );
-
-
-    error.textContent = "";
-
-
-    if (!email || !password) {
-
-        error.textContent =
-            "Please enter email and password.";
-
-        return;
-    }
-
-
-    await login(
-        email,
-        password
-    );
-
-}
 
 
 <!-- =====================================================
-     PRODUCTS
+     MAIN APPLICATION
 ===================================================== -->
 
-<section id="productsSection">
+<div id="appScreen" style="display:none;">
 
-    <h2>Products</h2>
 
-    <div class="form-grid">
+    <header class="header">
 
-        <input
-            id="productCode"
-            type="text"
-            placeholder="Product Code"
-        >
-
-        <input
-            id="productName"
-            type="text"
-            placeholder="Product Name"
-        >
-
-        <input
-            id="packSize"
-            type="text"
-            placeholder="Pack Size"
-        >
-
-        <input
-            id="unitTP"
-            type="number"
-            step="0.01"
-            placeholder="Unit TP"
-        >
-
-        <input
-            id="unitVAT"
-            type="number"
-            step="0.01"
-            placeholder="Unit VAT"
-        >
-
-        <input
-            id="unitRPVAT"
-            type="number"
-            step="0.01"
-            placeholder="Unit RP + VAT"
-        >
-
-    </div>
-
-    <div style="margin-top:15px;">
+        <h1>
+            Kemiko Invoice Management System
+        </h1>
 
         <button
-            id="productSaveButton"
-            onclick="saveProduct()"
+            class="logout-btn"
+            onclick="logoutUser()"
         >
-            Add Product
+            Logout
         </button>
+
+    </header>
+
+
+
+    <!-- NAVIGATION -->
+
+    <nav class="navbar">
 
         <button
-            onclick="clearProductForm()"
+            class="nav-btn"
+            onclick="showPage('representatives')"
         >
-            Clear
+            Representatives
         </button>
 
-    </div>
+
+        <button
+            class="nav-btn"
+            onclick="showPage('customers')"
+        >
+            Customers
+        </button>
 
 
-    <hr>
+        <button
+            class="nav-btn"
+            onclick="showPage('products')"
+        >
+            Products
+        </button>
+
+    </nav>
 
 
-    <input
-        id="productSearch"
-        type="text"
-        placeholder="Search Product..."
-        oninput="searchProducts()"
-        style="margin-bottom:15px;"
-    >
+
+    <main class="container">
 
 
-    <table>
+        <!-- =================================================
+             REPRESENTATIVES
+        ================================================== -->
 
-        <thead>
-            <tr>
-                <th>Code</th>
-                <th>Product</th>
-                <th>Pack</th>
-                <th>TP</th>
-                <th>VAT</th>
-                <th>RP + VAT</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+        <section
+            id="representatives-page"
+            class="page"
+        >
 
-        <tbody id="productsTableBody"></tbody>
+            <div class="card">
 
-    </table>
+                <h2>Representatives</h2>
 
-</section>
+                <div class="form-grid">
+
+                    <input
+                        id="repCode"
+                        placeholder="Representative Code"
+                    >
+
+                    <input
+                        id="repName"
+                        placeholder="Representative Name"
+                    >
+
+                    <input
+                        id="territoryCode"
+                        placeholder="Territory Code"
+                    >
+
+                    <input
+                        id="territoryName"
+                        placeholder="Territory Name"
+                    >
+
+                </div>
 
 
-    
+                <div class="button-row">
+
+                    <button
+                        class="primary-btn"
+                        onclick="saveRepresentative()"
+                    >
+                        Save Representative
+                    </button>
+
+                    <button
+                        class="secondary-btn"
+                        onclick="clearRepresentativeForm()"
+                    >
+                        Clear
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <input
+                    id="representativeSearch"
+                    class="search-box"
+                    placeholder="Search representatives..."
+                    oninput="searchRepresentatives()"
+                >
+
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Territory Code</th>
+                            <th>Territory Name</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody
+                        id="representativesTableBody"
+                    ></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             CUSTOMERS
+        ================================================== -->
+
+        <section
+            id="customers-page"
+            class="page"
+        >
+
+            <div class="card">
+
+                <h2>Customers</h2>
+
+                <div class="form-grid">
+
+                    <input
+                        id="customerCode"
+                        placeholder="Customer Code"
+                    >
+
+                    <input
+                        id="shopName"
+                        placeholder="Shop Name"
+                    >
+
+                    <input
+                        id="address"
+                        placeholder="Address"
+                    >
+
+                    <input
+                        id="ownerName"
+                        placeholder="Owner Name"
+                    >
+
+                    <input
+                        id="mobile"
+                        placeholder="Mobile"
+                    >
+
+                    <input
+                        id="email"
+                        type="email"
+                        placeholder="Email"
+                    >
+
+                    <select id="customerRepresentative">
+                        <option value="">
+                            Select Representative
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="button-row">
+
+                    <button
+                        class="primary-btn"
+                        onclick="saveCustomer()"
+                    >
+                        Save Customer
+                    </button>
+
+                    <button
+                        class="secondary-btn"
+                        onclick="clearCustomerForm()"
+                    >
+                        Clear
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <input
+                    id="customerSearch"
+                    class="search-box"
+                    placeholder="Search customer..."
+                    oninput="searchCustomers()"
+                >
+
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Code</th>
+                            <th>Shop</th>
+                            <th>Address</th>
+                            <th>Owner</th>
+                            <th>Mobile</th>
+                            <th>Email</th>
+                            <th>Representative</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody
+                        id="customersTableBody"
+                    ></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PRODUCTS
+        ================================================== -->
+
+        <section
+            id="products-page"
+            class="page"
+        >
+
+            <div class="card">
+
+                <h2>Products</h2>
+
+
+                <div class="form-grid">
+
+                    <input
+                        id="productCode"
+                        type="text"
+                        placeholder="Product Code"
+                    >
+
+                    <input
+                        id="productName"
+                        type="text"
+                        placeholder="Product Name"
+                    >
+
+                    <input
+                        id="packSize"
+                        type="text"
+                        placeholder="Pack Size"
+                    >
+
+                    <input
+                        id="unitTP"
+                        type="number"
+                        step="0.01"
+                        placeholder="Unit TP"
+                    >
+
+                    <input
+                        id="unitVAT"
+                        type="number"
+                        step="0.01"
+                        placeholder="Unit VAT"
+                    >
+
+                    <input
+                        id="unitRPVAT"
+                        type="number"
+                        step="0.01"
+                        placeholder="Unit RP + VAT"
+                    >
+
+                </div>
+
+
+                <div class="button-row">
+
+                    <button
+                        id="productSaveButton"
+                        class="primary-btn"
+                        onclick="saveProduct()"
+                    >
+                        Add Product
+                    </button>
+
+
+                    <button
+                        class="secondary-btn"
+                        onclick="clearProductForm()"
+                    >
+                        Clear
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <input
+                    id="productSearch"
+                    class="search-box"
+                    type="text"
+                    placeholder="Search product..."
+                    oninput="searchProducts()"
+                >
+
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Code</th>
+                            <th>Product</th>
+                            <th>Pack</th>
+                            <th>TP</th>
+                            <th>VAT</th>
+                            <th>RP + VAT</th>
+                            <th>Actions</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="productsTableBody"
+                    ></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<script>
+
+    /*
+     * ======================================================
+     * SUPABASE
+     * ======================================================
+     *
+     * KEEP YOUR EXISTING SUPABASE URL AND KEY HERE.
+     *
+     * If you already have these two values in your old
+     * index.html, use those same values.
+     */
+
+    const SUPABASE_URL =
+        "PASTE_YOUR_EXISTING_SUPABASE_URL_HERE";
+
+    const SUPABASE_KEY =
+        "PASTE_YOUR_EXISTING_SUPABASE_KEY_HERE";
+
+
+    const client =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+
+    let currentUser = null;
+
+
+    // ======================================================
+    // LOGIN
+    // ======================================================
+
+    async function loginUser() {
+
+        const email =
+            document.getElementById("loginEmail").value.trim();
+
+        const password =
+            document.getElementById("loginPassword").value;
+
+
+        const message =
+            document.getElementById("loginMessage");
+
+
+        if (!email || !password) {
+
+            message.textContent =
+                "Enter email and password.";
+
+            return;
+        }
+
+
+        const { data, error } =
+            await client.auth.signInWithPassword({
+                email,
+                password
+            });
+
+
+        if (error) {
+
+            message.textContent =
+                error.message;
+
+            return;
+        }
+
+
+        currentUser = data.user;
+
+        showApplication();
+
+    }
+
+
+
+    // ======================================================
+    // LOGOUT
+    // ======================================================
+
+    async function logoutUser() {
+
+        await client.auth.signOut();
+
+        currentUser = null;
+
+        document.getElementById("appScreen").style.display =
+            "none";
+
+        document.getElementById("loginScreen").style.display =
+            "flex";
+    }
+
+
+
+    // ======================================================
+    // SHOW APP
+    // ======================================================
+
+    function showApplication() {
+
+        document.getElementById("loginScreen").style.display =
+            "none";
+
+        document.getElementById("appScreen").style.display =
+            "block";
+
+
+        showPage("representatives");
+
+    }
+
+
+
+    // ======================================================
+    // PAGE NAVIGATION
+    // ======================================================
+
+    function showPage(page) {
+
+        const pages = [
+            "representatives-page",
+            "customers-page",
+            "products-page"
+        ];
+
+
+        pages.forEach(id => {
+
+            const element =
+                document.getElementById(id);
+
+            if (element) {
+                element.classList.remove("active");
+            }
+
+        });
+
+
+        if (page === "representatives") {
+
+            document
+                .getElementById("representatives-page")
+                .classList.add("active");
+
+            if (typeof loadRepresentatives === "function") {
+                loadRepresentatives();
+            }
+
+        }
+
+
+        if (page === "customers") {
+
+            document
+                .getElementById("customers-page")
+                .classList.add("active");
+
+            if (typeof loadRepresentatives === "function") {
+                loadRepresentatives();
+            }
+
+            if (typeof loadCustomers === "function") {
+                loadCustomers();
+            }
+
+        }
+
+
+        if (page === "products") {
+
+            document
+                .getElementById("products-page")
+                .classList.add("active");
+
+            if (typeof loadProducts === "function") {
+                loadProducts();
+            }
+
+        }
+
+    }
+
+
+    // ======================================================
+    // ESCAPE HTML
+    // ======================================================
+
+    function escapeHtml(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    // ======================================================
+    // CHECK LOGIN SESSION
+    // ======================================================
+
+    async function checkSession() {
+
+        const { data } =
+            await client.auth.getSession();
+
+
+        if (data.session) {
+
+            currentUser =
+                data.session.user;
+
+            showApplication();
+
+        } else {
+
+            document.getElementById(
+                "loginScreen"
+            ).style.display = "flex";
+
+        }
+
+    }
+
+
+    checkSession();
 
 </script>
 
-
-<script src="app.js"></script>
-
-
 </body>
-
 </html>
