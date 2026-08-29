@@ -1132,6 +1132,111 @@ async function handleLogin() {
 
 }
 
+
+<!-- =====================================================
+     PRODUCTS
+===================================================== -->
+
+<section id="productsSection" style="display:none;">
+
+    <h2>Products</h2>
+
+    <div class="form-grid">
+
+        <input
+            id="productCode"
+            type="text"
+            placeholder="Product Code"
+        >
+
+        <input
+            id="productName"
+            type="text"
+            placeholder="Product Name"
+        >
+
+        <input
+            id="packSize"
+            type="text"
+            placeholder="Pack Size"
+        >
+
+        <input
+            id="unitTP"
+            type="number"
+            step="0.01"
+            placeholder="Unit TP"
+        >
+
+        <input
+            id="unitVAT"
+            type="number"
+            step="0.01"
+            placeholder="Unit VAT"
+        >
+
+        <input
+            id="unitRPVAT"
+            type="number"
+            step="0.01"
+            placeholder="Unit RP + VAT"
+        >
+
+    </div>
+
+    <div style="margin-top:15px;">
+
+        <button
+            id="productSaveButton"
+            onclick="saveProduct()"
+        >
+            Add Product
+        </button>
+
+        <button
+            onclick="clearProductForm()"
+        >
+            Clear
+        </button>
+
+    </div>
+
+
+    <hr>
+
+
+    <input
+        id="productSearch"
+        type="text"
+        placeholder="Search Product..."
+        oninput="searchProducts()"
+        style="margin-bottom:15px;"
+    >
+
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Product</th>
+                <th>Pack</th>
+                <th>TP</th>
+                <th>VAT</th>
+                <th>RP + VAT</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody id="productsTableBody"></tbody>
+
+    </table>
+
+</section>
+
+
+    
+
 </script>
 
 
