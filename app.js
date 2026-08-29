@@ -1300,3 +1300,316 @@ document.addEventListener(
 
     }
 );
+
+
+// =========================================================
+// PRODUCTS MODULE
+// =========================================================
+
+let products = [];
+let editingProductId = null;
+
+
+// LOAD PRODUCTS
+async function loadProducts() {
+
+    const { data, error } = await client
+        .from("Products")
+        .select("*")
+        .order("product_name", { ascending: true });
+
+    if (error) {
+        alert("Could not load products:\n\n" + error.message);
+        return;
+    }
+
+    products = data || [];
+
+    renderProducts();
+}
+
+
+// RENDER PRODUCTS
+function renderProducts() {
+
+    const tbody =
+        document.getElementById("productsTableBody");
+
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    products.forEach(product => {
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${escapeHtml(product.product_code || "")}</td>
+            <td>${escapeHtml(product.product_name || "")}</td>
+            <td>${escapeHtml(product.pack_size || "")}</td>
+            <td>${Number(product.unit_tp || 0).toFixed(2)}</td>
+            <td>${Number(product.unit_vat || 0).toFixed(2)}</td>
+            <td>${Number(product.unit_rp_vat || 0).toFixed(2)}</td>
+
+            <td>
+                <button
+                    onclick="editProduct(${product.id})">
+                    Edit
+                </button>
+
+                <button
+                    onclick="deleteProduct(${product.id})">
+                    Delete
+                </button>
+            </td>
+        `;
+
+        tbody.appendChild(row);
+    });
+}
+
+
+// ADD / UPDATE PRODUCT
+async function saveProduct() {
+
+    const product_code =
+        document.getElementById("productCode")?.value.trim();
+
+    const product_name =
+        document.getElementById("productName")?.value.trim();
+
+    const pack_size =
+        document.getElementById("packSize")?.value.trim();
+
+    const unit_tp =
+        parseFloat(
+            document.getElementById("unitTP")?.value || 0
+        );
+
+    const unit_vat =
+        parseFloat(
+            document.getElementById("unitVAT")?.value || 0
+        );
+
+    const unit_rp_vat =
+        parseFloat(
+            document.getElementById("unitRPVAT")?.value || 0
+        );
+
+
+    if (!product_code || !product_name) {
+
+        alert(
+            "Product Code and Product Name are required."
+        );
+
+        return;
+    }
+
+
+    let error;
+
+
+    if (editingProductId) {
+
+        const result = await client
+            .from("Products")
+            .update({
+                product_code,
+                product_name,
+                pack_size,
+                unit_tp,
+                unit_vat,
+                unit_rp_vat
+            })
+            .eq("id", editingProductId);
+
+        error = result.error;
+
+    } else {
+
+        const result = await client
+            .from("Products")
+            .insert([{
+                product_code,
+                product_name,
+                pack_size,
+                unit_tp,
+                unit_vat,
+                unit_rp_vat
+            }]);
+
+        error = result.error;
+    }
+
+
+    if (error) {
+
+        alert(
+            "Could not save product:\n\n" +
+            error.message
+        );
+
+        return;
+    }
+
+
+    alert(
+        editingProductId
+            ? "Product updated successfully."
+            : "Product added successfully."
+    );
+
+
+    clearProductForm();
+
+    await loadProducts();
+}
+
+
+// EDIT PRODUCT
+function editProduct(id) {
+
+    const product =
+        products.find(
+            item => String(item.id) === String(id)
+        );
+
+
+    if (!product) {
+
+        alert("Product not found.");
+
+        return;
+    }
+
+
+    editingProductId = id;
+
+
+    document.getElementById("productCode").value =
+        product.product_code || "";
+
+    document.getElementById("productName").value =
+        product.product_name || "";
+
+    document.getElementById("packSize").value =
+        product.pack_size || "";
+
+    document.getElementById("unitTP").value =
+        product.unit_tp ?? "";
+
+    document.getElementById("unitVAT").value =
+        product.unit_vat ?? "";
+
+    document.getElementById("unitRPVAT").value =
+        product.unit_rp_vat ?? "";
+}
+
+
+// DELETE PRODUCT
+async function deleteProduct(id) {
+
+    const product =
+        products.find(
+            item => String(item.id) === String(id)
+        );
+
+
+    if (!product) {
+
+        alert("Product not found.");
+
+        return;
+    }
+
+
+    if (
+        !confirm(
+            `Delete product "${product.product_name}"?`
+        )
+    ) {
+        return;
+    }
+
+
+    // Check invoice usage
+    const { data: invoiceItems, error: checkError } =
+        await client
+            .from("InvoiceItems")
+            .select("id")
+            .eq("product_id", id)
+            .limit(1);
+
+
+    if (checkError) {
+
+        alert(
+            "Could not check product usage:\n\n" +
+            checkError.message
+        );
+
+        return;
+    }
+
+
+    if (
+        invoiceItems &&
+        invoiceItems.length > 0
+    ) {
+
+        alert(
+            "This product cannot be deleted because it is already used in an invoice."
+        );
+
+        return;
+    }
+
+
+    const { error } =
+        await client
+            .from("Products")
+            .delete()
+            .eq("id", id);
+
+
+    if (error) {
+
+        alert(
+            "Could not delete product:\n\n" +
+            error.message
+        );
+
+        return;
+    }
+
+
+    alert("Product deleted successfully.");
+
+    await loadProducts();
+}
+
+
+// CLEAR FORM
+function clearProductForm() {
+
+    [
+        "productCode",
+        "productName",
+        "packSize",
+        "unitTP",
+        "unitVAT",
+        "unitRPVAT"
+    ].forEach(id => {
+
+        const element =
+            document.getElementById(id);
+
+        if (element) {
+            element.value = "";
+        }
+    });
+
+
+    editingProductId = null;
+}
