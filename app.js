@@ -1,27 +1,15 @@
 const SUPABASE_URL = "https://bzfnsoqefgddkjjoleuz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_kR3TRDVXjwQaj0xatKYHCA_mxDy26T_";
 
-const supabase = window.supabase.createClient(
+const client = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
-let currentUser = null;
-
-async function checkLogin() {
-    const { data } = await supabase.auth.getSession();
-
-    if (data.session) {
-        currentUser = data.session.user;
-        showApp();
-    } else {
-        showLogin();
-    }
-}
-
 async function login(email, password) {
+
     const { data, error } =
-        await supabase.auth.signInWithPassword({
+        await client.auth.signInWithPassword({
             email: email,
             password: password
         });
@@ -31,33 +19,28 @@ async function login(email, password) {
         return false;
     }
 
-    currentUser = data.user;
-    showApp();
+    document.getElementById("login-page").style.display = "none";
+    document.getElementById("app-page").style.display = "block";
+
     return true;
 }
 
 async function logout() {
-    await supabase.auth.signOut();
-    currentUser = null;
-    showLogin();
+
+    await client.auth.signOut();
+
+    document.getElementById("login-page").style.display = "flex";
+    document.getElementById("app-page").style.display = "none";
 }
 
-function showLogin() {
-    const loginPage = document.getElementById("login-page");
-    const appPage = document.getElementById("app-page");
+async function checkLogin() {
 
-    if (loginPage) loginPage.style.display = "block";
-    if (appPage) appPage.style.display = "none";
+    const { data } = await client.auth.getSession();
+
+    if (data.session) {
+        document.getElementById("login-page").style.display = "none";
+        document.getElementById("app-page").style.display = "block";
+    }
 }
 
-function showApp() {
-    const loginPage = document.getElementById("login-page");
-    const appPage = document.getElementById("app-page");
-
-    if (loginPage) loginPage.style.display = "none";
-    if (appPage) appPage.style.display = "block";
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    checkLogin();
-});
+document.addEventListener("DOMContentLoaded", checkLogin);
