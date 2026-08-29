@@ -1117,49 +1117,62 @@ function editCustomer(id) {
 // =========================================================
 
 async function deleteCustomer(id) {
+    const customer = customers.find(item => String(item.id) === String(id));
 
-    const customer =
-        customers.find(
-            item => item.id === id
-        );
+    if (!customer) {
+        alert("Customer not found.");
+        return;
+    }
 
-
-    if (!customer) return;
-
-
-    const confirmed =
-        confirm(
-            `Delete customer "${customer.shop_name}"?`
-        );
-
+    const confirmed = confirm(
+        `Delete customer "${customer.shop_name}"?`
+    );
 
     if (!confirmed) return;
 
+    try {
+        // First check whether this customer is used by invoices
+        const { data: invoices, error: checkError } = await client
+            .from("Invoices")
+            .select("id")
+            .eq("customer_id", id)
+            .limit(1);
 
-    const { error } =
-        await client
+        if (checkError) {
+            alert("Could not check customer usage:\n\n" + checkError.message);
+            return;
+        }
+
+        if (invoices && invoices.length > 0) {
+            alert(
+                "This customer cannot be deleted because it is already used in an invoice."
+            );
+            return;
+        }
+
+        const { error } = await client
             .from("Customers")
             .delete()
             .eq("id", id);
 
+        if (error) {
+            alert(
+                "Could not delete customer:\n\n" +
+                error.message
+            );
+            return;
+        }
 
-    if (error) {
+        alert("Customer deleted successfully.");
 
+        await loadCustomers();
+
+    } catch (err) {
         alert(
-            "Could not delete customer:\n\n" +
-            error.message
+            "Delete failed:\n\n" +
+            (err.message || err)
         );
-
-        return;
     }
-
-
-    alert(
-        "Customer deleted successfully."
-    );
-
-
-    await loadCustomers();
 }
 
 
