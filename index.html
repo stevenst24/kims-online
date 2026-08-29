@@ -3,477 +3,560 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>
-        KIMS - Kemiko Invoice Management System
-    </title>
+<title>
+KIMS - Kemiko Invoice Management System
+</title>
 
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
+<script
+src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
 
 
-    <style>
+<style>
 
-        * {
-            box-sizing: border-box;
-        }
+* {
+    box-sizing: border-box;
+}
 
 
-        body {
+body {
 
-            margin: 0;
+    margin: 0;
 
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
-            background: #f4f6f8;
+    background: #f4f6f8;
 
-            color: #222;
-        }
+    color: #222;
+}
 
 
-        /* =================================================
-           LOGIN
-           ================================================= */
+/* =========================================================
+   LOGIN
+   ========================================================= */
 
-        #login-page {
+#login-page {
 
-            min-height: 100vh;
+    min-height: 100vh;
 
-            display: flex;
+    display: flex;
 
-            align-items: center;
+    align-items: center;
 
-            justify-content: center;
+    justify-content: center;
 
-            padding: 20px;
-        }
+    padding: 20px;
+}
 
 
-        .login-box {
+.login-box {
 
-            width: 100%;
+    width: 100%;
 
-            max-width: 400px;
+    max-width: 400px;
 
-            background: white;
+    background: white;
 
-            padding: 35px;
+    padding: 35px;
 
-            border-radius: 14px;
+    border-radius: 14px;
 
-            box-shadow:
-                0 5px 25px
-                rgba(0,0,0,.12);
-        }
+    box-shadow:
+        0 5px 25px
+        rgba(0,0,0,.12);
+}
 
 
-        .login-box h1 {
+.login-box h1 {
 
-            text-align: center;
+    text-align: center;
 
-            margin: 0;
+    margin: 0;
 
-            font-size: 32px;
-        }
+    font-size: 32px;
+}
 
 
-        .login-box .subtitle {
+.subtitle {
 
-            text-align: center;
+    text-align: center;
 
-            color: #666;
+    color: #666;
 
-            margin:
-                8px 0 25px;
-        }
+    margin:
+        8px 0 25px;
+}
 
 
-        /* =================================================
-           GENERAL INPUT
-           ================================================= */
+/* =========================================================
+   INPUTS
+   ========================================================= */
 
-        input {
+input,
+select {
 
-            width: 100%;
+    width: 100%;
 
-            padding: 12px 14px;
+    padding:
+        12px 14px;
 
-            margin-top: 7px;
+    margin-top: 7px;
 
-            margin-bottom: 15px;
+    margin-bottom: 15px;
 
-            border:
-                1px solid #ccc;
+    border:
+        1px solid #ccc;
 
-            border-radius: 7px;
+    border-radius: 7px;
 
-            font-size: 15px;
-        }
+    font-size: 15px;
 
+    background: white;
+}
 
-        input:focus {
 
-            outline: none;
+input:focus,
+select:focus {
 
-            border-color: #1667d9;
+    outline: none;
 
-            box-shadow:
-                0 0 0 2px
-                rgba(22,103,217,.1);
-        }
+    border-color: #1667d9;
 
+    box-shadow:
+        0 0 0 2px
+        rgba(22,103,217,.1);
+}
 
-        button {
 
-            border: none;
+button {
 
-            border-radius: 7px;
+    border: none;
 
-            padding:
-                10px 16px;
+    border-radius: 7px;
 
-            cursor: pointer;
+    padding:
+        10px 16px;
 
-            font-size: 14px;
+    cursor: pointer;
 
-            font-weight: 600;
-        }
+    font-size: 14px;
 
+    font-weight: 600;
+}
 
-        .primary-btn {
 
-            background: #1667d9;
+.primary-btn {
 
-            color: white;
+    background: #1667d9;
 
-            width: 100%;
+    color: white;
 
-            padding: 13px;
+    width: 100%;
 
-            font-size: 16px;
-        }
+    padding: 13px;
 
+    font-size: 16px;
+}
 
-        .primary-btn:hover {
 
-            background: #0f56bb;
-        }
+.primary-btn:hover {
 
+    background: #0f56bb;
+}
 
-        /* =================================================
-           APP
-           ================================================= */
 
-        #app-page {
+/* =========================================================
+   APP
+   ========================================================= */
 
-            display: none;
+#app-page {
 
-            min-height: 100vh;
-        }
+    display: none;
 
+    min-height: 100vh;
+}
 
-        header {
 
-            background: white;
+header {
 
-            border-bottom:
-                1px solid #ddd;
+    background: white;
 
-            padding:
-                16px 25px;
+    border-bottom:
+        1px solid #ddd;
 
-            display: flex;
+    padding:
+        16px 25px;
 
-            justify-content: space-between;
+    display: flex;
 
-            align-items: center;
-        }
+    justify-content:
+        space-between;
 
+    align-items: center;
+}
 
-        header h2 {
 
-            margin: 0;
+header h2 {
 
-            color: #1667d9;
-        }
+    margin: 0;
 
+    color: #1667d9;
+}
 
-        .logout-btn {
 
-            background: #d9534f;
+.logout-btn {
 
-            color: white;
-        }
+    background: #d9534f;
 
+    color: white;
+}
 
-        .container {
 
-            max-width: 1200px;
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
 
-            margin: auto;
+.navbar {
 
-            padding: 25px;
-        }
+    background: #1667d9;
 
+    padding:
+        10px 25px;
 
-        /* =================================================
-           PAGE TITLE
-           ================================================= */
+    display: flex;
 
-        .page-header {
+    gap: 8px;
 
-            display: flex;
+    flex-wrap: wrap;
+}
 
-            justify-content:
-                space-between;
 
-            align-items: center;
+.nav-btn {
 
-            margin-bottom: 20px;
-        }
+    background:
+        rgba(255,255,255,.15);
 
+    color: white;
 
-        .page-header h1 {
+    padding:
+        10px 18px;
+}
 
-            margin: 0;
 
-            font-size: 28px;
-        }
+.nav-btn:hover {
 
+    background:
+        rgba(255,255,255,.25);
+}
 
-        /* =================================================
-           FORM CARD
-           ================================================= */
 
-        .card {
+/* =========================================================
+   CONTAINER
+   ========================================================= */
 
-            background: white;
+.container {
 
-            border-radius: 10px;
+    max-width: 1400px;
 
-            padding: 22px;
+    margin: auto;
 
-            margin-bottom: 25px;
+    padding: 25px;
+}
 
-            box-shadow:
-                0 2px 10px
-                rgba(0,0,0,.07);
-        }
 
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
 
-        .card h2 {
+.page-header {
 
-            margin-top: 0;
+    display: flex;
 
-            margin-bottom: 20px;
-        }
+    justify-content:
+        space-between;
 
+    align-items: center;
 
-        .form-grid {
+    margin-bottom: 20px;
+}
 
-            display: grid;
 
-            grid-template-columns:
-                repeat(2, 1fr);
+.page-header h1 {
 
-            gap:
-                0 20px;
-        }
+    margin: 0;
 
+    font-size: 28px;
+}
 
-        .form-group label {
 
-            font-weight: 600;
+/* =========================================================
+   CARD
+   ========================================================= */
 
-            font-size: 14px;
-        }
+.card {
 
+    background: white;
 
-        .form-actions {
+    border-radius: 10px;
 
-            margin-top: 5px;
+    padding: 22px;
 
-            display: flex;
+    margin-bottom: 25px;
 
-            gap: 10px;
-        }
+    box-shadow:
+        0 2px 10px
+        rgba(0,0,0,.07);
+}
 
 
-        #save-representative-btn {
+.card h2 {
 
-            background: #1667d9;
+    margin-top: 0;
 
-            color: white;
-        }
+    margin-bottom: 20px;
+}
 
 
-        #cancel-edit-btn {
+/* =========================================================
+   FORM
+   ========================================================= */
 
-            background: #777;
+.form-grid {
 
-            color: white;
+    display: grid;
 
-            display: none;
-        }
+    grid-template-columns:
+        repeat(2, 1fr);
 
+    gap:
+        0 20px;
+}
 
-        /* =================================================
-           SEARCH
-           ================================================= */
 
-        .search-box {
+.form-group label {
 
-            margin-bottom: 18px;
-        }
+    font-weight: 600;
 
+    font-size: 14px;
+}
 
-        .search-box input {
 
-            margin: 0;
+.form-actions {
 
-            max-width: 450px;
-        }
+    margin-top: 5px;
 
+    display: flex;
 
-        /* =================================================
-           TABLE
-           ================================================= */
+    gap: 10px;
 
-        .table-wrapper {
+    flex-wrap: wrap;
+}
 
-            overflow-x: auto;
-        }
 
+#save-representative-btn,
+#save-customer-btn {
 
-        table {
+    background: #1667d9;
 
-            width: 100%;
+    color: white;
+}
 
-            border-collapse: collapse;
 
-            min-width: 750px;
-        }
+#cancel-edit-btn,
+#cancel-customer-edit-btn {
 
+    background: #777;
 
-        th {
+    color: white;
 
-            background: #f0f2f5;
+    display: none;
+}
 
-            text-align: left;
 
-            padding: 13px;
+/* =========================================================
+   SEARCH
+   ========================================================= */
 
-            border-bottom:
-                1px solid #ddd;
+.search-box {
 
-            font-size: 14px;
-        }
+    margin-bottom: 18px;
+}
 
 
-        td {
+.search-box input {
 
-            padding: 13px;
+    margin: 0;
 
-            border-bottom:
-                1px solid #eee;
+    max-width: 500px;
+}
 
-            font-size: 14px;
-        }
 
+/* =========================================================
+   TABLE
+   ========================================================= */
 
-        tr:hover td {
+.table-wrapper {
 
-            background: #fafafa;
-        }
+    overflow-x: auto;
+}
 
 
-        .actions {
+table {
 
-            white-space: nowrap;
-        }
+    width: 100%;
 
+    border-collapse:
+        collapse;
 
-        .edit-btn {
+    min-width: 800px;
+}
 
-            background: #f0ad4e;
 
-            color: white;
+th {
 
-            margin-right: 5px;
-        }
+    background:
+        #f0f2f5;
 
+    text-align: left;
 
-        .delete-btn {
+    padding: 13px;
 
-            background: #d9534f;
+    border-bottom:
+        1px solid #ddd;
 
-            color: white;
-        }
+    font-size: 14px;
+}
 
 
-        .empty {
+td {
 
-            text-align: center;
+    padding: 13px;
 
-            color: #777;
+    border-bottom:
+        1px solid #eee;
 
-            padding: 30px;
-        }
+    font-size: 14px;
+}
 
 
-        /* =================================================
-           MOBILE
-           ================================================= */
+tr:hover td {
 
-        @media (max-width: 700px) {
+    background:
+        #fafafa;
+}
 
-            header {
 
-                padding: 14px 16px;
-            }
+.actions {
 
+    white-space:
+        nowrap;
+}
 
-            .container {
 
-                padding: 15px;
-            }
+.edit-btn {
 
+    background:
+        #f0ad4e;
 
-            .form-grid {
+    color: white;
 
-                grid-template-columns: 1fr;
-            }
+    margin-right: 5px;
+}
 
 
-            .page-header {
+.delete-btn {
 
-                align-items: flex-start;
+    background:
+        #d9534f;
 
-                flex-direction: column;
+    color: white;
+}
 
-                gap: 8px;
-            }
 
+.empty {
 
-            .card {
+    text-align: center;
 
-                padding: 16px;
-            }
+    color: #777;
 
-        }
+    padding: 30px;
+}
 
-    </style>
+
+/* =========================================================
+   CUSTOMER PAGE
+   ========================================================= */
+
+#customers-page {
+
+    display: none;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    header {
+
+        padding:
+            14px 16px;
+    }
+
+
+    .navbar {
+
+        padding:
+            10px 15px;
+    }
+
+
+    .container {
+
+        padding: 15px;
+    }
+
+
+    .form-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .page-header {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+        gap: 8px;
+    }
+
+
+    .card {
+
+        padding: 16px;
+    }
+
+}
+
+</style>
 
 </head>
 
@@ -481,9 +564,9 @@
 <body>
 
 
-<!-- =====================================================
+<!-- =======================================================
      LOGIN
-     ===================================================== -->
+     ======================================================= -->
 
 <div id="login-page">
 
@@ -525,214 +608,486 @@
 </div>
 
 
-<!-- =====================================================
+<!-- =======================================================
      APPLICATION
-     ===================================================== -->
+     ======================================================= -->
 
 <div id="app-page">
 
 
-    <header>
+<header>
 
-        <h2>KIMS</h2>
+    <h2>
+        KIMS
+    </h2>
 
 
-        <button
-            class="logout-btn"
-            onclick="logout()"
-        >
-            Logout
-        </button>
+    <button
+        class="logout-btn"
+        onclick="logout()"
+    >
+        Logout
+    </button>
 
-    </header>
+</header>
 
 
-    <main class="container">
+<!-- =======================================================
+     NAVIGATION
+     ======================================================= -->
 
+<nav class="navbar">
 
-        <div class="page-header">
+    <button
+        class="nav-btn"
+        onclick="showPage('representatives')"
+    >
+        Representatives
+    </button>
 
-            <h1>
-                Representatives
-            </h1>
 
-        </div>
+    <button
+        class="nav-btn"
+        onclick="showPage('customers')"
+    >
+        Customers
+    </button>
 
+</nav>
 
-        <!-- =================================================
-             REPRESENTATIVE FORM
-             ================================================= -->
 
-        <div class="card">
+<main class="container">
 
-            <h2>
-                Add / Edit Representative
-            </h2>
 
+<!-- =======================================================
+     REPRESENTATIVES
+     ======================================================= -->
 
-            <div class="form-grid">
+<section
+    id="representatives-page"
+>
 
 
-                <div class="form-group">
+<div class="page-header">
 
-                    <label>
-                        Representative Code *
-                    </label>
-
-                    <input
-                        type="text"
-                        id="rep-code"
-                        placeholder="Example: SYL-117"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Representative Name *
-                    </label>
-
-                    <input
-                        type="text"
-                        id="rep-name"
-                        placeholder="Example: Abdul Bari"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Territory Code
-                    </label>
-
-                    <input
-                        type="text"
-                        id="territory-code"
-                        placeholder="Example: SYL"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Territory Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="territory-name"
-                        placeholder="Example: Sylhet"
-                    >
-
-                </div>
-
-
-            </div>
-
-
-            <div class="form-actions">
-
-                <button
-                    id="save-representative-btn"
-                    onclick="saveRepresentative()"
-                >
-                    Create Representative
-                </button>
-
-
-                <button
-                    id="cancel-edit-btn"
-                    onclick="clearRepresentativeForm()"
-                >
-                    Cancel
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             REPRESENTATIVE LIST
-             ================================================= -->
-
-        <div class="card">
-
-            <h2>
-                Representative List
-            </h2>
-
-
-            <div class="search-box">
-
-                <input
-                    type="text"
-                    id="representative-search"
-                    placeholder="Search code, name or territory..."
-                >
-
-            </div>
-
-
-            <div class="table-wrapper">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Representative Code
-                            </th>
-
-                            <th>
-                                Representative Name
-                            </th>
-
-                            <th>
-                                Territory Code
-                            </th>
-
-                            <th>
-                                Territory Name
-                            </th>
-
-                            <th>
-                                Actions
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody
-                        id="representatives-table-body"
-                    >
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-
-    </main>
+    <h1>
+        Representatives
+    </h1>
 
 </div>
 
 
-<script src="app.js"></script>
+<div class="card">
 
+    <h2>
+        Add / Edit Representative
+    </h2>
+
+
+    <div class="form-grid">
+
+
+        <div class="form-group">
+
+            <label>
+                Representative Code *
+            </label>
+
+            <input
+                type="text"
+                id="rep-code"
+                placeholder="Example: SYL-117"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Representative Name *
+            </label>
+
+            <input
+                type="text"
+                id="rep-name"
+                placeholder="Example: Abdul Bari"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Territory Code
+            </label>
+
+            <input
+                type="text"
+                id="territory-code"
+                placeholder="Example: SYL"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Territory Name
+            </label>
+
+            <input
+                type="text"
+                id="territory-name"
+                placeholder="Example: Sylhet"
+            >
+
+        </div>
+
+
+    </div>
+
+
+    <div class="form-actions">
+
+        <button
+            id="save-representative-btn"
+            onclick="saveRepresentative()"
+        >
+            Create Representative
+        </button>
+
+
+        <button
+            id="cancel-edit-btn"
+            onclick="clearRepresentativeForm()"
+        >
+            Cancel
+        </button>
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <h2>
+        Representative List
+    </h2>
+
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="representative-search"
+            placeholder="Search code, name or territory..."
+        >
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Representative Code
+                    </th>
+
+                    <th>
+                        Representative Name
+                    </th>
+
+                    <th>
+                        Territory Code
+                    </th>
+
+                    <th>
+                        Territory Name
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody
+                id="representatives-table-body"
+            >
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+</section>
+
+
+<!-- =======================================================
+     CUSTOMERS
+     ======================================================= -->
+
+<section
+    id="customers-page"
+>
+
+
+<div class="page-header">
+
+    <h1>
+        Customers
+    </h1>
+
+</div>
+
+
+<div class="card">
+
+    <h2>
+        Add / Edit Customer
+    </h2>
+
+
+    <div class="form-grid">
+
+
+        <div class="form-group">
+
+            <label>
+                Customer Code *
+            </label>
+
+            <input
+                type="text"
+                id="customer-code"
+                placeholder="Example: CUS-001"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Shop Name *
+            </label>
+
+            <input
+                type="text"
+                id="shop-name"
+                placeholder="Example: Maa Pharmacy"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Address
+            </label>
+
+            <input
+                type="text"
+                id="customer-address"
+                placeholder="Customer address"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Owner Name
+            </label>
+
+            <input
+                type="text"
+                id="owner-name"
+                placeholder="Owner name"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Mobile
+            </label>
+
+            <input
+                type="text"
+                id="customer-mobile"
+                placeholder="Mobile number"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Email
+            </label>
+
+            <input
+                type="email"
+                id="customer-email"
+                placeholder="Email address"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Representative *
+            </label>
+
+            <select
+                id="customer-representative"
+            >
+
+                <option value="">
+                    Select Representative
+                </option>
+
+            </select>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="form-actions">
+
+        <button
+            id="save-customer-btn"
+            onclick="saveCustomer()"
+        >
+            Create Customer
+        </button>
+
+
+        <button
+            id="cancel-customer-edit-btn"
+            onclick="clearCustomerForm()"
+        >
+            Cancel
+        </button>
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <h2>
+        Customer List
+    </h2>
+
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="customer-search"
+            placeholder="Search code, shop, owner, mobile or representative..."
+        >
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Customer Code
+                    </th>
+
+                    <th>
+                        Shop Name
+                    </th>
+
+                    <th>
+                        Address
+                    </th>
+
+                    <th>
+                        Owner
+                    </th>
+
+                    <th>
+                        Mobile
+                    </th>
+
+                    <th>
+                        Email
+                    </th>
+
+                    <th>
+                        Representative
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody
+                id="customers-table-body"
+            >
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+</section>
+
+
+</main>
+
+</div>
+
+
+<!-- =======================================================
+     LOGIN SCRIPT
+     ======================================================= -->
 
 <script>
 
@@ -753,7 +1108,9 @@ async function handleLogin() {
 
     const error =
         document
-            .getElementById("login-error");
+            .getElementById(
+                "login-error"
+            );
 
 
     error.textContent = "";
@@ -768,23 +1125,17 @@ async function handleLogin() {
     }
 
 
-    const success =
-        await login(
-            email,
-            password
-        );
-
-
-    if (!success) {
-
-        error.textContent =
-            "Login failed.";
-
-    }
+    await login(
+        email,
+        password
+    );
 
 }
 
 </script>
+
+
+<script src="app.js"></script>
 
 
 </body>
