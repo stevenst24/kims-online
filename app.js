@@ -1,35 +1,62 @@
 // =========================================================
 // KIMS ONLINE
-// Supabase
+// app.js
 // =========================================================
 
-const SUPABASE_URL = "https://bzfnsoqefgddkjjoleuz.supabase.co";
-const SUPABASE_KEY = "sb_publishable_kR3TRDVXjwQaj0xatKYHCA_mxDy26T_";
+// =========================================================
+// SUPABASE
+// =========================================================
 
-const client = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+const SUPABASE_URL =
+    "https://bzfnsoqefgddkjjoleuz.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_kR3TRDVXjwQaj0xatKYHCA_mxDy26T_";
+
+const client =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
 
 
 // =========================================================
 // GLOBAL DATA
 // =========================================================
 
-let representatives = [];
+let currentUser = null;
 
+let representatives = [];
 let customers = [];
+let products = [];
 
 let editingRepresentativeId = null;
-
 let editingCustomerId = null;
+let editingProductId = null;
 
 
 // =========================================================
 // LOGIN
 // =========================================================
 
-async function login(email, password) {
+async function loginUser() {
+
+    const email =
+        document.getElementById("loginEmail").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+    const message =
+        document.getElementById("loginMessage");
+
+    if (!email || !password) {
+        message.textContent =
+            "Enter email and password.";
+        return;
+    }
+
+    message.textContent = "Logging in...";
 
     const { data, error } =
         await client.auth.signInWithPassword({
@@ -39,14 +66,19 @@ async function login(email, password) {
 
     if (error) {
 
-        alert(error.message);
+        console.error(error);
 
-        return false;
+        message.textContent =
+            error.message;
+
+        return;
     }
 
-    showApp();
+    currentUser = data.user;
 
-    return true;
+    message.textContent = "";
+
+    showApplication();
 }
 
 
@@ -54,48 +86,19 @@ async function login(email, password) {
 // LOGOUT
 // =========================================================
 
-async function logout() {
+async function logoutUser() {
 
     await client.auth.signOut();
 
-    showLogin();
-}
-
-
-// =========================================================
-// LOGIN CHECK
-// =========================================================
-
-async function checkLogin() {
-
-    const { data } =
-        await client.auth.getSession();
-
-    if (data.session) {
-
-        showApp();
-
-    } else {
-
-        showLogin();
-
-    }
-}
-
-
-// =========================================================
-// SHOW LOGIN
-// =========================================================
-
-function showLogin() {
+    currentUser = null;
 
     document.getElementById(
-        "login-page"
-    ).style.display = "flex";
-
-    document.getElementById(
-        "app-page"
+        "appScreen"
     ).style.display = "none";
+
+    document.getElementById(
+        "loginScreen"
+    ).style.display = "flex";
 }
 
 
@@ -103,85 +106,119 @@ function showLogin() {
 // SHOW APPLICATION
 // =========================================================
 
-function showApp() {
+function showApplication() {
 
     document.getElementById(
-        "login-page"
+        "loginScreen"
     ).style.display = "none";
 
     document.getElementById(
-        "app-page"
+        "appScreen"
     ).style.display = "block";
 
-
-    loadRepresentatives();
-
-    loadCustomers();
+    showPage("representatives");
 }
 
 
 // =========================================================
-// NAVIGATION
+// PAGE NAVIGATION
 // =========================================================
 
 function showPage(page) {
 
-    const representativesPage =
-        document.getElementById("representatives-page");
+    const pages = [
+        "representatives-page",
+        "customers-page",
+        "products-page"
+    ];
 
-    const customersPage =
-        document.getElementById("customers-page");
+    pages.forEach(id => {
 
-    const productsPage =
-        document.getElementById("productsSection");
+        const element =
+            document.getElementById(id);
 
-
-    if (representativesPage) {
-        representativesPage.style.display = "none";
-    }
-
-    if (customersPage) {
-        customersPage.style.display = "none";
-    }
-
-    if (productsPage) {
-        productsPage.style.display = "none";
-    }
+        if (element) {
+            element.classList.remove("active");
+        }
+    });
 
 
+    // REPRESENTATIVES
     if (page === "representatives") {
 
-        if (representativesPage) {
-            representativesPage.style.display = "block";
+        const element =
+            document.getElementById(
+                "representatives-page"
+            );
+
+        if (element) {
+            element.classList.add("active");
         }
 
         loadRepresentatives();
+
+        return;
     }
 
 
+    // CUSTOMERS
     if (page === "customers") {
 
-        if (customersPage) {
-            customersPage.style.display = "block";
+        const element =
+            document.getElementById(
+                "customers-page"
+            );
+
+        if (element) {
+            element.classList.add("active");
         }
 
+        loadRepresentatives();
         loadCustomers();
+
+        return;
     }
 
 
+    // PRODUCTS
     if (page === "products") {
 
-        if (productsPage) {
-            productsPage.style.display = "block";
+        const element =
+            document.getElementById(
+                "products-page"
+            );
+
+        if (element) {
+            element.classList.add("active");
         }
 
         loadProducts();
+
+        return;
     }
 }
+
+
+// =========================================================
+// ESCAPE HTML
+// =========================================================
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 
 // =========================================================
 // REPRESENTATIVES
 // =========================================================
+
+// LOAD REPRESENTATIVES
 
 async function loadRepresentatives() {
 
@@ -192,7 +229,6 @@ async function loadRepresentatives() {
             .order("rep_name", {
                 ascending: true
             });
-
 
     if (error) {
 
@@ -206,10 +242,8 @@ async function loadRepresentatives() {
         return;
     }
 
-
     representatives =
         data || [];
-
 
     displayRepresentatives();
 
@@ -223,14 +257,25 @@ async function loadRepresentatives() {
 
 function displayRepresentatives() {
 
+    const searchInput =
+        document.getElementById(
+            "representativeSearch"
+        );
+
+    const tbody =
+        document.getElementById(
+            "representativesTableBody"
+        );
+
+    if (!tbody) return;
+
+
     const search =
-        document
-            .getElementById(
-                "representative-search"
-            )
-            .value
-            .trim()
-            .toLowerCase();
+        searchInput
+            ? searchInput.value
+                .trim()
+                .toLowerCase()
+            : "";
 
 
     const filtered =
@@ -238,37 +283,38 @@ function displayRepresentatives() {
 
             return (
 
-                (rep.rep_code || "")
+                String(
+                    rep.rep_code || ""
+                )
                     .toLowerCase()
                     .includes(search)
 
                 ||
 
-                (rep.rep_name || "")
+                String(
+                    rep.rep_name || ""
+                )
                     .toLowerCase()
                     .includes(search)
 
                 ||
 
-                (rep.territory_code || "")
+                String(
+                    rep.territory_code || ""
+                )
                     .toLowerCase()
                     .includes(search)
 
                 ||
 
-                (rep.territory_name || "")
+                String(
+                    rep.territory_name || ""
+                )
                     .toLowerCase()
                     .includes(search)
 
             );
-
         });
-
-
-    const tbody =
-        document.getElementById(
-            "representatives-table-body"
-        );
 
 
     tbody.innerHTML = "";
@@ -278,7 +324,7 @@ function displayRepresentatives() {
 
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="empty">
+                <td colspan="5">
                     No representatives found
                 </td>
             </tr>
@@ -297,19 +343,19 @@ function displayRepresentatives() {
         row.innerHTML = `
 
             <td>
-                ${escapeHtml(rep.rep_code || "")}
+                ${escapeHtml(rep.rep_code)}
             </td>
 
             <td>
-                ${escapeHtml(rep.rep_name || "")}
+                ${escapeHtml(rep.rep_name)}
             </td>
 
             <td>
-                ${escapeHtml(rep.territory_code || "")}
+                ${escapeHtml(rep.territory_code)}
             </td>
 
             <td>
-                ${escapeHtml(rep.territory_name || "")}
+                ${escapeHtml(rep.territory_name)}
             </td>
 
             <td class="actions">
@@ -329,13 +375,22 @@ function displayRepresentatives() {
                 </button>
 
             </td>
-
         `;
 
 
         tbody.appendChild(row);
 
     });
+}
+
+
+// =========================================================
+// SEARCH REPRESENTATIVES
+// =========================================================
+
+function searchRepresentatives() {
+
+    displayRepresentatives();
 }
 
 
@@ -347,28 +402,28 @@ async function saveRepresentative() {
 
     const repCode =
         document
-            .getElementById("rep-code")
+            .getElementById("repCode")
             .value
             .trim();
 
 
     const repName =
         document
-            .getElementById("rep-name")
+            .getElementById("repName")
             .value
             .trim();
 
 
     const territoryCode =
         document
-            .getElementById("territory-code")
+            .getElementById("territoryCode")
             .value
             .trim();
 
 
     const territoryName =
         document
-            .getElementById("territory-name")
+            .getElementById("territoryName")
             .value
             .trim();
 
@@ -402,7 +457,6 @@ async function saveRepresentative() {
         territory_code: territoryCode,
 
         territory_name: territoryName
-
     };
 
 
@@ -426,7 +480,6 @@ async function saveRepresentative() {
             await client
                 .from("Representatives")
                 .insert([record]);
-
     }
 
 
@@ -462,53 +515,58 @@ function editRepresentative(id) {
 
     const rep =
         representatives.find(
-            item => item.id === id
+            item =>
+                String(item.id) ===
+                String(id)
         );
 
 
-    if (!rep) return;
+    if (!rep) {
+
+        alert("Representative not found.");
+
+        return;
+    }
 
 
     editingRepresentativeId = id;
 
 
     document.getElementById(
-        "rep-code"
+        "repCode"
     ).value =
         rep.rep_code || "";
 
 
     document.getElementById(
-        "rep-name"
+        "repName"
     ).value =
         rep.rep_name || "";
 
 
     document.getElementById(
-        "territory-code"
+        "territoryCode"
     ).value =
         rep.territory_code || "";
 
 
     document.getElementById(
-        "territory-name"
+        "territoryName"
     ).value =
         rep.territory_name || "";
 
 
-    document.getElementById(
-        "save-representative-btn"
-    ).textContent =
-        "Update Representative";
+    const saveButton =
+        document.querySelector(
+            "#representatives-page .primary-btn"
+        );
 
 
-    document.getElementById(
-        "cancel-edit-btn"
-    ).style.display =
-        "inline-block";
+    if (saveButton) {
 
-
-    showPage("representatives");
+        saveButton.textContent =
+            "Update Representative";
+    }
 
 
     window.scrollTo({
@@ -526,11 +584,20 @@ async function deleteRepresentative(id) {
 
     const rep =
         representatives.find(
-            item => item.id === id
+            item =>
+                String(item.id) ===
+                String(id)
         );
 
 
-    if (!rep) return;
+    if (!rep) {
+
+        alert(
+            "Representative not found."
+        );
+
+        return;
+    }
 
 
     const confirmed =
@@ -540,6 +607,40 @@ async function deleteRepresentative(id) {
 
 
     if (!confirmed) return;
+
+
+    // Check customer usage first
+
+    const { data: usedCustomers, error: checkError } =
+        await client
+            .from("Customers")
+            .select("id")
+            .eq("representative_id", id)
+            .limit(1);
+
+
+    if (checkError) {
+
+        alert(
+            "Could not check representative usage:\n\n" +
+            checkError.message
+        );
+
+        return;
+    }
+
+
+    if (
+        usedCustomers &&
+        usedCustomers.length > 0
+    ) {
+
+        alert(
+            "This representative cannot be deleted because customers are assigned to this representative."
+        );
+
+        return;
+    }
 
 
     const { error } =
@@ -570,7 +671,7 @@ async function deleteRepresentative(id) {
 
 
 // =========================================================
-// CLEAR REPRESENTATIVE FORM
+// CLEAR REPRESENTATIVE
 // =========================================================
 
 function clearRepresentativeForm() {
@@ -579,41 +680,44 @@ function clearRepresentativeForm() {
 
 
     document.getElementById(
-        "rep-code"
+        "repCode"
     ).value = "";
 
 
     document.getElementById(
-        "rep-name"
+        "repName"
     ).value = "";
 
 
     document.getElementById(
-        "territory-code"
+        "territoryCode"
     ).value = "";
 
 
     document.getElementById(
-        "territory-name"
+        "territoryName"
     ).value = "";
 
 
-    document.getElementById(
-        "save-representative-btn"
-    ).textContent =
-        "Create Representative";
+    const saveButton =
+        document.querySelector(
+            "#representatives-page .primary-btn"
+        );
 
 
-    document.getElementById(
-        "cancel-edit-btn"
-    ).style.display =
-        "none";
+    if (saveButton) {
+
+        saveButton.textContent =
+            "Save Representative";
+    }
 }
 
 
 // =========================================================
 // CUSTOMER
 // =========================================================
+
+// LOAD CUSTOMERS
 
 async function loadCustomers() {
 
@@ -661,14 +765,27 @@ async function loadCustomers() {
 
 function displayCustomers() {
 
+    const searchInput =
+        document.getElementById(
+            "customerSearch"
+        );
+
+
+    const tbody =
+        document.getElementById(
+            "customersTableBody"
+        );
+
+
+    if (!tbody) return;
+
+
     const search =
-        document
-            .getElementById(
-                "customer-search"
-            )
-            .value
-            .trim()
-            .toLowerCase();
+        searchInput
+            ? searchInput.value
+                .trim()
+                .toLowerCase()
+            : "";
 
 
     const filtered =
@@ -680,49 +797,62 @@ function displayCustomers() {
 
             return (
 
-                (customer.customer_code || "")
+                String(
+                    customer.customer_code || ""
+                )
                     .toLowerCase()
                     .includes(search)
 
                 ||
 
-                (customer.shop_name || "")
+                String(
+                    customer.shop_name || ""
+                )
                     .toLowerCase()
                     .includes(search)
 
                 ||
 
-                (customer.address || "")
+                String(
+                    customer.address || ""
+                )
                     .toLowerCase()
                     .includes(search)
 
                 ||
 
-                (customer.owner_name || "")
+                String(
+                    customer.owner_name || ""
+                )
                     .toLowerCase()
                     .includes(search)
 
                 ||
 
-                (customer.mobile || "")
+                String(
+                    customer.mobile || ""
+                )
                     .toLowerCase()
                     .includes(search)
 
                 ||
 
-                (rep.rep_name || "")
+                String(
+                    customer.email || ""
+                )
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                String(
+                    rep.rep_name || ""
+                )
                     .toLowerCase()
                     .includes(search)
 
             );
-
         });
-
-
-    const tbody =
-        document.getElementById(
-            "customers-table-body"
-        );
 
 
     tbody.innerHTML = "";
@@ -732,7 +862,7 @@ function displayCustomers() {
 
         tbody.innerHTML = `
             <tr>
-                <td colspan="8" class="empty">
+                <td colspan="8">
                     No customers found
                 </td>
             </tr>
@@ -756,37 +886,37 @@ function displayCustomers() {
 
             <td>
                 ${escapeHtml(
-                    customer.customer_code || ""
+                    customer.customer_code
                 )}
             </td>
 
             <td>
                 ${escapeHtml(
-                    customer.shop_name || ""
+                    customer.shop_name
                 )}
             </td>
 
             <td>
                 ${escapeHtml(
-                    customer.address || ""
+                    customer.address
                 )}
             </td>
 
             <td>
                 ${escapeHtml(
-                    customer.owner_name || ""
+                    customer.owner_name
                 )}
             </td>
 
             <td>
                 ${escapeHtml(
-                    customer.mobile || ""
+                    customer.mobile
                 )}
             </td>
 
             <td>
                 ${escapeHtml(
-                    customer.email || ""
+                    customer.email
                 )}
             </td>
 
@@ -824,6 +954,16 @@ function displayCustomers() {
 
 
 // =========================================================
+// SEARCH CUSTOMERS
+// =========================================================
+
+function searchCustomers() {
+
+    displayCustomers();
+}
+
+
+// =========================================================
 // REPRESENTATIVE DROPDOWN
 // =========================================================
 
@@ -831,8 +971,11 @@ function populateRepresentativeDropdown() {
 
     const select =
         document.getElementById(
-            "customer-representative"
+            "customerRepresentative"
         );
+
+
+    if (!select) return;
 
 
     const currentValue =
@@ -852,7 +995,8 @@ function populateRepresentativeDropdown() {
             document.createElement("option");
 
 
-        option.value = rep.id;
+        option.value =
+            rep.id;
 
 
         option.textContent =
@@ -868,7 +1012,6 @@ function populateRepresentativeDropdown() {
 
         select.value =
             currentValue;
-
     }
 }
 
@@ -881,54 +1024,42 @@ async function saveCustomer() {
 
     const customerCode =
         document
-            .getElementById(
-                "customer-code"
-            )
+            .getElementById("customerCode")
             .value
             .trim();
 
 
     const shopName =
         document
-            .getElementById(
-                "shop-name"
-            )
+            .getElementById("shopName")
             .value
             .trim();
 
 
     const address =
         document
-            .getElementById(
-                "customer-address"
-            )
+            .getElementById("address")
             .value
             .trim();
 
 
     const ownerName =
         document
-            .getElementById(
-                "owner-name"
-            )
+            .getElementById("ownerName")
             .value
             .trim();
 
 
     const mobile =
         document
-            .getElementById(
-                "customer-mobile"
-            )
+            .getElementById("mobile")
             .value
             .trim();
 
 
     const email =
         document
-            .getElementById(
-                "customer-email"
-            )
+            .getElementById("email")
             .value
             .trim();
 
@@ -936,7 +1067,7 @@ async function saveCustomer() {
     const representativeId =
         document
             .getElementById(
-                "customer-representative"
+                "customerRepresentative"
             )
             .value;
 
@@ -993,7 +1124,6 @@ async function saveCustomer() {
 
         representative_id:
             Number(representativeId)
-
     };
 
 
@@ -1017,7 +1147,6 @@ async function saveCustomer() {
             await client
                 .from("Customers")
                 .insert([record]);
-
     }
 
 
@@ -1053,68 +1182,78 @@ function editCustomer(id) {
 
     const customer =
         customers.find(
-            item => item.id === id
+            item =>
+                String(item.id) ===
+                String(id)
         );
 
 
-    if (!customer) return;
+    if (!customer) {
+
+        alert(
+            "Customer not found."
+        );
+
+        return;
+    }
 
 
     editingCustomerId = id;
 
 
     document.getElementById(
-        "customer-code"
+        "customerCode"
     ).value =
         customer.customer_code || "";
 
 
     document.getElementById(
-        "shop-name"
+        "shopName"
     ).value =
         customer.shop_name || "";
 
 
     document.getElementById(
-        "customer-address"
+        "address"
     ).value =
         customer.address || "";
 
 
     document.getElementById(
-        "owner-name"
+        "ownerName"
     ).value =
         customer.owner_name || "";
 
 
     document.getElementById(
-        "customer-mobile"
+        "mobile"
     ).value =
         customer.mobile || "";
 
 
     document.getElementById(
-        "customer-email"
+        "email"
     ).value =
         customer.email || "";
 
 
     document.getElementById(
-        "customer-representative"
+        "customerRepresentative"
     ).value =
         customer.representative_id || "";
 
 
-    document.getElementById(
-        "save-customer-btn"
-    ).textContent =
-        "Update Customer";
+    const saveButton =
+        document.querySelector(
+            "#customers-page .primary-btn"
+        );
 
 
-    document.getElementById(
-        "cancel-customer-edit-btn"
-    ).style.display =
-        "inline-block";
+    if (saveButton) {
+
+        saveButton.textContent =
+            "Update Customer";
+    }
 
 
     showPage("customers");
@@ -1132,60 +1271,113 @@ function editCustomer(id) {
 // =========================================================
 
 async function deleteCustomer(id) {
-    const customer = customers.find(item => String(item.id) === String(id));
+
+    const customer =
+        customers.find(
+            item =>
+                String(item.id) ===
+                String(id)
+        );
+
 
     if (!customer) {
-        alert("Customer not found.");
+
+        alert(
+            "Customer not found."
+        );
+
         return;
     }
 
-    const confirmed = confirm(
-        `Delete customer "${customer.shop_name}"?`
-    );
+
+    const confirmed =
+        confirm(
+            `Delete customer "${customer.shop_name}"?`
+        );
+
 
     if (!confirmed) return;
 
+
     try {
-        // First check whether this customer is used by invoices
-        const { data: invoices, error: checkError } = await client
-            .from("Invoices")
-            .select("id")
-            .eq("customer_id", id)
-            .limit(1);
+
+        // Check invoice usage
+
+        const {
+            data: invoices,
+            error: checkError
+        } =
+            await client
+                .from("Invoices")
+                .select("id")
+                .eq(
+                    "customer_id",
+                    id
+                )
+                .limit(1);
+
 
         if (checkError) {
-            alert("Could not check customer usage:\n\n" + checkError.message);
+
+            alert(
+                "Could not check customer usage:\n\n" +
+                checkError.message
+            );
+
             return;
         }
 
-        if (invoices && invoices.length > 0) {
+
+        if (
+            invoices &&
+            invoices.length > 0
+        ) {
+
             alert(
                 "This customer cannot be deleted because it is already used in an invoice."
             );
+
             return;
         }
 
-        const { error } = await client
-            .from("Customers")
-            .delete()
-            .eq("id", id);
+
+        // Delete customer
+
+        const { error } =
+            await client
+                .from("Customers")
+                .delete()
+                .eq(
+                    "id",
+                    id
+                );
+
 
         if (error) {
+
             alert(
                 "Could not delete customer:\n\n" +
                 error.message
             );
+
             return;
         }
 
-        alert("Customer deleted successfully.");
+
+        alert(
+            "Customer deleted successfully."
+        );
+
 
         await loadCustomers();
 
-    } catch (err) {
+    } catch (error) {
+
+        console.error(error);
+
         alert(
             "Delete failed:\n\n" +
-            (err.message || err)
+            error.message
         );
     }
 }
@@ -1201,268 +1393,374 @@ function clearCustomerForm() {
 
 
     document.getElementById(
-        "customer-code"
+        "customerCode"
     ).value = "";
 
 
     document.getElementById(
-        "shop-name"
+        "shopName"
     ).value = "";
 
 
     document.getElementById(
-        "customer-address"
+        "address"
     ).value = "";
 
 
     document.getElementById(
-        "owner-name"
+        "ownerName"
     ).value = "";
 
 
     document.getElementById(
-        "customer-mobile"
+        "mobile"
     ).value = "";
 
 
     document.getElementById(
-        "customer-email"
+        "email"
     ).value = "";
 
 
     document.getElementById(
-        "customer-representative"
+        "customerRepresentative"
     ).value = "";
 
 
-    document.getElementById(
-        "save-customer-btn"
-    ).textContent =
-        "Create Customer";
-
-
-    document.getElementById(
-        "cancel-customer-edit-btn"
-    ).style.display =
-        "none";
-}
-
-
-// =========================================================
-// ESCAPE HTML
-// =========================================================
-
-function escapeHtml(value) {
-
-    return String(value)
-
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-
-        .replaceAll(
-            "'",
-            "&#039;"
+    const saveButton =
+        document.querySelector(
+            "#customers-page .primary-btn"
         );
+
+
+    if (saveButton) {
+
+        saveButton.textContent =
+            "Save Customer";
+    }
 }
 
 
 // =========================================================
-// START APPLICATION
+// PRODUCTS
 // =========================================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        checkLogin();
-
-
-        document
-            .getElementById(
-                "representative-search"
-            )
-            .addEventListener(
-                "input",
-                displayRepresentatives
-            );
-
-
-        document
-            .getElementById(
-                "customer-search"
-            )
-            .addEventListener(
-                "input",
-                displayCustomers
-            );
-
-    }
-);
-
-
-// =========================================================
-// PRODUCTS MODULE
-// =========================================================
-
-let products = [];
-let editingProductId = null;
-
 
 // LOAD PRODUCTS
+
 async function loadProducts() {
 
-    const { data, error } = await client
-        .from("Products")
-        .select("*")
-        .order("product_name", { ascending: true });
+    const { data, error } =
+        await client
+            .from("Products")
+            .select("*")
+            .order(
+                "product_name",
+                {
+                    ascending: true
+                }
+            );
+
 
     if (error) {
-        alert("Could not load products:\n\n" + error.message);
+
+        console.error(error);
+
+        alert(
+            "Could not load products:\n\n" +
+            error.message
+        );
+
         return;
     }
 
-    products = data || [];
+
+    products =
+        data || [];
+
 
     renderProducts();
 }
 
 
-// RENDER PRODUCTS
+// =========================================================
+// DISPLAY PRODUCTS
+// =========================================================
+
 function renderProducts() {
 
     const tbody =
-        document.getElementById("productsTableBody");
+        document.getElementById(
+            "productsTableBody"
+        );
+
 
     if (!tbody) return;
 
+
+    const searchInput =
+        document.getElementById(
+            "productSearch"
+        );
+
+
+    const search =
+        searchInput
+            ? searchInput.value
+                .trim()
+                .toLowerCase()
+            : "";
+
+
+    const filtered =
+        products.filter(product => {
+
+            return (
+
+                String(
+                    product.product_code || ""
+                )
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                String(
+                    product.product_name || ""
+                )
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                String(
+                    product.pack_size || ""
+                )
+                    .toLowerCase()
+                    .includes(search)
+
+            );
+        });
+
+
     tbody.innerHTML = "";
 
-    products.forEach(product => {
 
-        const row = document.createElement("tr");
+    if (filtered.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7">
+                    No products found
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    filtered.forEach(product => {
+
+        const row =
+            document.createElement("tr");
+
 
         row.innerHTML = `
-            <td>${escapeHtml(product.product_code || "")}</td>
-            <td>${escapeHtml(product.product_name || "")}</td>
-            <td>${escapeHtml(product.pack_size || "")}</td>
-            <td>${Number(product.unit_tp || 0).toFixed(2)}</td>
-            <td>${Number(product.unit_vat || 0).toFixed(2)}</td>
-            <td>${Number(product.unit_rp_vat || 0).toFixed(2)}</td>
 
             <td>
+                ${escapeHtml(
+                    product.product_code
+                )}
+            </td>
+
+            <td>
+                ${escapeHtml(
+                    product.product_name
+                )}
+            </td>
+
+            <td>
+                ${escapeHtml(
+                    product.pack_size
+                )}
+            </td>
+
+            <td>
+                ${Number(
+                    product.unit_tp || 0
+                ).toFixed(2)}
+            </td>
+
+            <td>
+                ${Number(
+                    product.unit_vat || 0
+                ).toFixed(2)}
+            </td>
+
+            <td>
+                ${Number(
+                    product.unit_rp_vat || 0
+                ).toFixed(2)}
+            </td>
+
+            <td class="actions">
+
                 <button
-                    onclick="editProduct(${product.id})">
+                    class="edit-btn"
+                    onclick="editProduct(${product.id})"
+                >
                     Edit
                 </button>
 
                 <button
-                    onclick="deleteProduct(${product.id})">
+                    class="delete-btn"
+                    onclick="deleteProduct(${product.id})"
+                >
                     Delete
                 </button>
+
             </td>
+
         `;
 
+
         tbody.appendChild(row);
+
     });
 }
 
 
-// ADD / UPDATE PRODUCT
+// =========================================================
+// SEARCH PRODUCTS
+// =========================================================
+
+function searchProducts() {
+
+    renderProducts();
+}
+
+
+// =========================================================
+// SAVE PRODUCT
+// =========================================================
+
 async function saveProduct() {
 
-    const product_code =
-        document.getElementById("productCode")?.value.trim();
+    const productCode =
+        document
+            .getElementById("productCode")
+            .value
+            .trim();
 
-    const product_name =
-        document.getElementById("productName")?.value.trim();
 
-    const pack_size =
-        document.getElementById("packSize")?.value.trim();
+    const productName =
+        document
+            .getElementById("productName")
+            .value
+            .trim();
 
-    const unit_tp =
+
+    const packSize =
+        document
+            .getElementById("packSize")
+            .value
+            .trim();
+
+
+    const unitTP =
         parseFloat(
-            document.getElementById("unitTP")?.value || 0
+            document
+                .getElementById("unitTP")
+                .value || 0
         );
 
-    const unit_vat =
+
+    const unitVAT =
         parseFloat(
-            document.getElementById("unitVAT")?.value || 0
+            document
+                .getElementById("unitVAT")
+                .value || 0
         );
 
-    const unit_rp_vat =
+
+    const unitRPVAT =
         parseFloat(
-            document.getElementById("unitRPVAT")?.value || 0
+            document
+                .getElementById("unitRPVAT")
+                .value || 0
         );
 
 
-    if (!product_code || !product_name) {
+    if (!productCode) {
 
         alert(
-            "Product Code and Product Name are required."
+            "Please enter Product Code."
         );
 
         return;
     }
 
 
-    let error;
+    if (!productName) {
+
+        alert(
+            "Please enter Product Name."
+        );
+
+        return;
+    }
+
+
+    const record = {
+
+        product_code:
+            productCode,
+
+        product_name:
+            productName,
+
+        pack_size:
+            packSize,
+
+        unit_tp:
+            unitTP,
+
+        unit_vat:
+            unitVAT,
+
+        unit_rp_vat:
+            unitRPVAT
+    };
+
+
+    let result;
 
 
     if (editingProductId) {
 
-        const result = await client
-            .from("Products")
-            .update({
-                product_code,
-                product_name,
-                pack_size,
-                unit_tp,
-                unit_vat,
-                unit_rp_vat
-            })
-            .eq("id", editingProductId);
-
-        error = result.error;
+        result =
+            await client
+                .from("Products")
+                .update(record)
+                .eq(
+                    "id",
+                    editingProductId
+                );
 
     } else {
 
-        const result = await client
-            .from("Products")
-            .insert([{
-                product_code,
-                product_name,
-                pack_size,
-                unit_tp,
-                unit_vat,
-                unit_rp_vat
-            }]);
-
-        error = result.error;
+        result =
+            await client
+                .from("Products")
+                .insert([record]);
     }
 
 
-    if (error) {
+    if (result.error) {
 
         alert(
             "Could not save product:\n\n" +
-            error.message
+            result.error.message
         );
 
         return;
@@ -1482,18 +1780,25 @@ async function saveProduct() {
 }
 
 
+// =========================================================
 // EDIT PRODUCT
+// =========================================================
+
 function editProduct(id) {
 
     const product =
         products.find(
-            item => String(item.id) === String(id)
+            item =>
+                String(item.id) ===
+                String(id)
         );
 
 
     if (!product) {
 
-        alert("Product not found.");
+        alert(
+            "Product not found."
+        );
 
         return;
     }
@@ -1502,58 +1807,108 @@ function editProduct(id) {
     editingProductId = id;
 
 
-    document.getElementById("productCode").value =
+    document.getElementById(
+        "productCode"
+    ).value =
         product.product_code || "";
 
-    document.getElementById("productName").value =
+
+    document.getElementById(
+        "productName"
+    ).value =
         product.product_name || "";
 
-    document.getElementById("packSize").value =
+
+    document.getElementById(
+        "packSize"
+    ).value =
         product.pack_size || "";
 
-    document.getElementById("unitTP").value =
+
+    document.getElementById(
+        "unitTP"
+    ).value =
         product.unit_tp ?? "";
 
-    document.getElementById("unitVAT").value =
+
+    document.getElementById(
+        "unitVAT"
+    ).value =
         product.unit_vat ?? "";
 
-    document.getElementById("unitRPVAT").value =
+
+    document.getElementById(
+        "unitRPVAT"
+    ).value =
         product.unit_rp_vat ?? "";
+
+
+    const saveButton =
+        document.getElementById(
+            "productSaveButton"
+        );
+
+
+    if (saveButton) {
+
+        saveButton.textContent =
+            "Update Product";
+    }
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 }
 
 
+// =========================================================
 // DELETE PRODUCT
+// =========================================================
+
 async function deleteProduct(id) {
 
     const product =
         products.find(
-            item => String(item.id) === String(id)
+            item =>
+                String(item.id) ===
+                String(id)
         );
 
 
     if (!product) {
 
-        alert("Product not found.");
+        alert(
+            "Product not found."
+        );
 
         return;
     }
 
 
-    if (
-        !confirm(
+    const confirmed =
+        confirm(
             `Delete product "${product.product_name}"?`
-        )
-    ) {
-        return;
-    }
+        );
+
+
+    if (!confirmed) return;
 
 
     // Check invoice usage
-    const { data: invoiceItems, error: checkError } =
+
+    const {
+        data: invoiceItems,
+        error: checkError
+    } =
         await client
             .from("InvoiceItems")
             .select("id")
-            .eq("product_id", id)
+            .eq(
+                "product_id",
+                id
+            )
             .limit(1);
 
 
@@ -1585,7 +1940,10 @@ async function deleteProduct(id) {
         await client
             .from("Products")
             .delete()
-            .eq("id", id);
+            .eq(
+                "id",
+                id
+            );
 
 
     if (error) {
@@ -1599,23 +1957,35 @@ async function deleteProduct(id) {
     }
 
 
-    alert("Product deleted successfully.");
+    alert(
+        "Product deleted successfully."
+    );
+
 
     await loadProducts();
 }
 
 
-// CLEAR FORM
+// =========================================================
+// CLEAR PRODUCT
+// =========================================================
+
 function clearProductForm() {
 
-    [
+    editingProductId = null;
+
+
+    const fields = [
         "productCode",
         "productName",
         "packSize",
         "unitTP",
         "unitVAT",
         "unitRPVAT"
-    ].forEach(id => {
+    ];
+
+
+    fields.forEach(id => {
 
         const element =
             document.getElementById(id);
@@ -1623,8 +1993,144 @@ function clearProductForm() {
         if (element) {
             element.value = "";
         }
+
     });
 
 
-    editingProductId = null;
+    const saveButton =
+        document.getElementById(
+            "productSaveButton"
+        );
+
+
+    if (saveButton) {
+
+        saveButton.textContent =
+            "Add Product";
+    }
 }
+
+
+// =========================================================
+// CHECK SESSION
+// =========================================================
+
+async function checkSession() {
+
+    const { data, error } =
+        await client.auth.getSession();
+
+
+    if (error) {
+
+        console.error(error);
+
+        showLogin();
+
+        return;
+    }
+
+
+    if (data.session) {
+
+        currentUser =
+            data.session.user;
+
+        showApplication();
+
+    } else {
+
+        showLogin();
+    }
+}
+
+
+// =========================================================
+// SHOW LOGIN
+// =========================================================
+
+function showLogin() {
+
+    document.getElementById(
+        "appScreen"
+    ).style.display = "none";
+
+    document.getElementById(
+        "loginScreen"
+    ).style.display = "flex";
+}
+
+
+// =========================================================
+// AUTH STATE LISTENER
+// =========================================================
+
+client.auth.onAuthStateChange(
+    (event, session) => {
+
+        if (session) {
+
+            currentUser =
+                session.user;
+
+        } else {
+
+            currentUser = null;
+        }
+    }
+);
+
+
+// =========================================================
+// START
+// =========================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const repSearch =
+            document.getElementById(
+                "representativeSearch"
+            );
+
+        if (repSearch) {
+
+            repSearch.addEventListener(
+                "input",
+                searchRepresentatives
+            );
+        }
+
+
+        const customerSearch =
+            document.getElementById(
+                "customerSearch"
+            );
+
+        if (customerSearch) {
+
+            customerSearch.addEventListener(
+                "input",
+                searchCustomers
+            );
+        }
+
+
+        const productSearch =
+            document.getElementById(
+                "productSearch"
+            );
+
+        if (productSearch) {
+
+            productSearch.addEventListener(
+                "input",
+                searchProducts
+            );
+        }
+
+
+        checkSession();
+    }
+);
