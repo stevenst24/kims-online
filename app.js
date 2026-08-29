@@ -127,42 +127,57 @@ function showApp() {
 function showPage(page) {
 
     const representativesPage =
-        document.getElementById(
-            "representatives-page"
-        );
+        document.getElementById("representatives-page");
 
     const customersPage =
-        document.getElementById(
-            "customers-page"
-        );
+        document.getElementById("customers-page");
+
+    const productsPage =
+        document.getElementById("productsSection");
 
 
-    representativesPage.style.display = "none";
+    if (representativesPage) {
+        representativesPage.style.display = "none";
+    }
 
-    customersPage.style.display = "none";
+    if (customersPage) {
+        customersPage.style.display = "none";
+    }
+
+    if (productsPage) {
+        productsPage.style.display = "none";
+    }
 
 
     if (page === "representatives") {
 
-        representativesPage.style.display =
-            "block";
+        if (representativesPage) {
+            representativesPage.style.display = "block";
+        }
 
         loadRepresentatives();
-
     }
 
 
     if (page === "customers") {
 
-        customersPage.style.display =
-            "block";
+        if (customersPage) {
+            customersPage.style.display = "block";
+        }
 
         loadCustomers();
-
     }
 
-}
 
+    if (page === "products") {
+
+        if (productsPage) {
+            productsPage.style.display = "block";
+        }
+
+        loadProducts();
+    }
+}
 
 // =========================================================
 // REPRESENTATIVES
