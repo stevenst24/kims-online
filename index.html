@@ -1,1582 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KIMS Online</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-*{box-sizing:border-box}
-body{
-    margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f4f7f5;
-    color:#1f2937;
-}
-.app{display:flex;min-height:100vh}
+    <title>KIMS - Kemiko Invoice Management System</title>
 
-.sidebar{
-    width:245px;
-    background:#14532d;
-    color:white;
-    position:fixed;
-    left:0;
-    top:0;
-    bottom:0;
-    padding:20px 14px;
-}
-.brand{text-align:center;padding:8px 0 28px}
-.brand img{
-    width:70px;
-    height:70px;
-    object-fit:contain;
-    background:white;
-    border-radius:10px;
-    padding:5px;
-}
-.brand-title{font-size:25px;font-weight:bold;margin-top:8px}
-.brand-subtitle{font-size:12px;opacity:.8}
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-.navigation{display:flex;flex-direction:column;gap:6px}
-.nav-item{
-    color:white;
-    text-decoration:none;
-    padding:13px 14px;
-    border-radius:8px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    cursor:pointer;
-}
-.nav-item:hover,.nav-item.active{background:#166534}
-.nav-item span{
-    width:32px;
-    text-align:center;
-    font-size:12px;
-    font-weight:bold;
-}
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+        }
 
-.sidebar-bottom{
-    position:absolute;
-    bottom:20px;
-    left:14px;
-    right:14px;
-}
-.logout{
-    display:block;
-    padding:12px;
-    color:white;
-    text-decoration:none;
-    border-radius:8px;
-    background:#166534;
-    text-align:center;
-}
+        #login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.main{
-    margin-left:245px;
-    width:calc(100% - 245px);
-}
-.topbar{
-    background:white;
-    padding:20px 28px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid #e5e7eb;
-}
-.topbar h1{margin:0;font-size:25px}
-.topbar p{margin:5px 0 0;color:#6b7280}
+        .login-box {
+            width: 360px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.12);
+        }
 
-.user{display:flex;align-items:center;gap:10px}
-.avatar{
-    width:40px;height:40px;
-    border-radius:50%;
-    background:#166534;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:bold;
-}
-.user-info span{
-    display:block;
-    font-size:12px;
-    color:#6b7280;
-}
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
 
-.content{padding:25px}
+        .login-box p {
+            text-align: center;
+            color: #666;
+        }
 
-.page{display:none}
-.page.active{display:block}
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
 
-.cards{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:18px;
-}
-.card{
-    background:white;
-    border-radius:12px;
-    padding:22px;
-    border:1px solid #e5e7eb;
-}
-.card-title{color:#6b7280;font-size:14px}
-.card-number{font-size:30px;font-weight:bold;margin-top:8px;color:#14532d}
+        button {
+            width: 100%;
+            padding: 12px;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #1667d9;
+            color: white;
+            font-size: 16px;
+        }
 
-.panel{
-    background:white;
-    border-radius:12px;
-    padding:24px;
-    margin-bottom:20px;
-    border:1px solid #e5e7eb;
-}
-.panel h2{margin-top:0}
+        button:hover {
+            opacity: .9;
+        }
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:15px;
-}
-.field{display:flex;flex-direction:column;gap:6px}
-.field label{font-weight:bold;font-size:14px}
-input,select{
-    width:100%;
-    padding:11px 12px;
-    border:1px solid #d1d5db;
-    border-radius:7px;
-    font-size:14px;
-    background:white;
-}
-input:focus,select:focus{
-    outline:none;
-    border-color:#166534;
-}
+        #app-page {
+            display: none;
+        }
 
-.btn{
-    border:none;
-    border-radius:7px;
-    padding:11px 17px;
-    cursor:pointer;
-    font-weight:bold;
-    font-size:14px;
-}
-.btn-primary{background:#166534;color:white}
-.btn-secondary{background:#e5e7eb;color:#374151}
-.btn-danger{background:#fee2e2;color:#b91c1c}
-.btn-warning{background:#fef3c7;color:#92400e}
+        header {
+            background: white;
+            padding: 18px 25px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-.form-actions{
-    margin-top:18px;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
+        header h2 {
+            margin: 0;
+        }
 
-.table-wrap{overflow-x:auto}
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:700px;
-}
-th{
-    background:#f8fafc;
-    text-align:left;
-    padding:12px;
-    border-bottom:2px solid #e5e7eb;
-}
-td{
-    padding:12px;
-    border-bottom:1px solid #e5e7eb;
-}
-.actions{display:flex;gap:6px;flex-wrap:wrap}
+        .logout {
+            width: auto;
+            background: #d9534f;
+            padding: 8px 18px;
+        }
 
-.invoice-header{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:15px;
-    margin-bottom:20px;
-}
-.info{
-    border:1px solid #e5e7eb;
-    border-radius:8px;
-    padding:13px;
-}
-.info small{
-    display:block;
-    color:#6b7280;
-    margin-bottom:5px;
-}
-.info strong{font-size:15px}
+        .dashboard {
+            padding: 30px;
+        }
 
-.invoice-total{
-    display:flex;
-    justify-content:flex-end;
-    margin-top:20px;
-}
-.total-box{
-    width:320px;
-    border-top:2px solid #14532d;
-    padding-top:12px;
-}
-.total-row{
-    display:flex;
-    justify-content:space-between;
-    padding:5px 0;
-}
-.grand{
-    font-size:21px;
-    font-weight:bold;
-    color:#14532d;
-}
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
 
-.search{
-    margin-bottom:15px;
-}
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.08);
+        }
 
-.empty{
-    text-align:center;
-    padding:40px;
-    color:#6b7280;
-}
-
-@media(max-width:1000px){
-    .cards{grid-template-columns:repeat(2,1fr)}
-    .invoice-header{grid-template-columns:repeat(2,1fr)}
-}
-
-@media(max-width:700px){
-    .sidebar{
-        width:100%;
-        height:auto;
-        bottom:auto;
-        position:relative;
-    }
-    .app{display:block}
-    .navigation{
-        flex-direction:row;
-        overflow-x:auto;
-    }
-    .nav-item{white-space:nowrap}
-    .sidebar-bottom{display:none}
-    .main{
-        margin-left:0;
-        width:100%;
-    }
-    .topbar{
-        padding:15px;
-    }
-    .user-info{display:none}
-    .content{padding:15px}
-    .cards{grid-template-columns:1fr}
-    .grid{grid-template-columns:1fr}
-    .invoice-header{grid-template-columns:1fr}
-    .panel{padding:16px}
-}
-</style>
+        .card h3 {
+            margin-top: 0;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="app">
+<!-- LOGIN -->
+<div id="login-page">
 
-<aside class="sidebar">
+    <div class="login-box">
 
-<div class="brand">
-    <img src="https://raw.githubusercontent.com/stevenst24/kims-online/main/kemiko_logo.png"
-         onerror="this.style.display='none'">
-    <div class="brand-title">KIMS</div>
-    <div class="brand-subtitle">Invoice Management</div>
-</div>
-
-<nav class="navigation">
-
-<a class="nav-item active" onclick="showPage('dashboard',this)">
-    <span>DAS</span>Dashboard
-</a>
-
-<a class="nav-item" onclick="showPage('representatives',this)">
-    <span>REP</span>Representatives
-</a>
-
-<a class="nav-item" onclick="showPage('customers',this)">
-    <span>CUS</span>Customers
-</a>
-
-<a class="nav-item" onclick="showPage('products',this)">
-    <span>PRO</span>Products
-</a>
-
-<a class="nav-item" onclick="showPage('invoice',this)">
-    <span>INV</span>New Invoice
-</a>
-
-<a class="nav-item" onclick="showPage('history',this)">
-    <span>HIS</span>Invoice History
-</a>
-
-</nav>
-
-<div class="sidebar-bottom">
-<a class="logout" href="#" onclick="return false;">Logout</a>
-</div>
-
-</aside>
-
-
-<main class="main">
-
-<header class="topbar">
-
-<div>
-<h1 id="pageTitle">Dashboard</h1>
-<p id="pageSubtitle">Kemiko Invoice Management System</p>
-</div>
-
-<div class="user">
-<div class="avatar">K</div>
-<div class="user-info">
-<strong>KIMS User</strong>
-<span>Online System</span>
-</div>
-</div>
-
-</header>
-
-
-<section class="content">
-
-
-<!-- DASHBOARD -->
-
-<div id="dashboard" class="page active">
-
-<div class="cards">
-
-<div class="card">
-<div class="card-title">Representatives</div>
-<div class="card-number" id="repCount">0</div>
-</div>
-
-<div class="card">
-<div class="card-title">Customers</div>
-<div class="card-number" id="customerCount">0</div>
-</div>
-
-<div class="card">
-<div class="card-title">Products</div>
-<div class="card-number" id="productCount">0</div>
-</div>
-
-<div class="card">
-<div class="card-title">Invoices</div>
-<div class="card-number" id="invoiceCount">0</div>
-</div>
-
-</div>
-
-<div class="panel" style="margin-top:20px">
-<h2>KIMS Online</h2>
-<p>
-Your online Kemiko Invoice Management System is ready.
-</p>
-
-<button class="btn btn-primary"
-onclick="showPage('invoice')">
-Create New Invoice
-</button>
-</div>
-
-</div>
-
-
-<!-- REPRESENTATIVES -->
-
-<div id="representatives" class="page">
-
-<div class="panel">
-
-<h2>Representatives</h2>
-
-<div class="grid">
-
-<div class="field">
-<label>Representative Code</label>
-<input id="repCode" placeholder="SYL-117">
-</div>
-
-<div class="field">
-<label>Representative Name</label>
-<input id="repName" placeholder="Representative name">
-</div>
-
-<div class="field">
-<label>Territory Code</label>
-<input id="territoryCode" placeholder="SYL">
-</div>
-
-<div class="field">
-<label>Territory Name</label>
-<input id="territoryName" placeholder="Sylhet">
-</div>
-
-</div>
-
-<div class="form-actions">
-<button class="btn btn-primary" onclick="addRepresentative()">
-Add Representative
-</button>
-</div>
-
-</div>
-
-<div class="panel">
-
-<div class="table-wrap">
-
-<table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Name</th>
-<th>Territory Code</th>
-<th>Territory Name</th>
-<th>Action</th>
-</tr>
-</thead>
-
-<tbody id="repTable"></tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- CUSTOMERS -->
-
-<div id="customers" class="page">
-
-<div class="panel">
-
-<h2>Customers</h2>
-
-<div class="grid">
-
-<div class="field">
-<label>Customer Code</label>
-<input id="customerCode" placeholder="CUS-001">
-</div>
-
-<div class="field">
-<label>Shop Name</label>
-<input id="shopName" placeholder="Pharmacy name">
-</div>
-
-<div class="field">
-<label>Address</label>
-<input id="customerAddress" placeholder="Address">
-</div>
-
-<div class="field">
-<label>Owner Name</label>
-<input id="ownerName" placeholder="Owner">
-</div>
-
-<div class="field">
-<label>Mobile</label>
-<input id="customerMobile" placeholder="01XXXXXXXXX">
-</div>
-
-<div class="field">
-<label>Representative</label>
-<select id="customerRep"></select>
-</div>
-
-</div>
-
-<div class="form-actions">
-<button class="btn btn-primary" onclick="addCustomer()">
-Add Customer
-</button>
-</div>
-
-</div>
-
-<div class="panel">
-
-<input class="search"
-id="customerSearch"
-placeholder="Search customer..."
-oninput="renderCustomers()">
-
-<div class="table-wrap">
-
-<table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Shop</th>
-<th>Address</th>
-<th>Owner</th>
-<th>Mobile</th>
-<th>Representative</th>
-<th>Action</th>
-</tr>
-</thead>
-
-<tbody id="customerTable"></tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- PRODUCTS -->
+        <h1>KIMS</h1>
 
-<div id="products" class="page">
+        <p>Kemiko Invoice Management System</p>
 
-<div class="panel">
+        <input
+            type="email"
+            id="email"
+            placeholder="Email"
+        >
 
-<h2>Products</h2>
+        <input
+            type="password"
+            id="password"
+            placeholder="Password"
+        >
 
-<div class="grid">
+        <button onclick="handleLogin()">
+            Login
+        </button>
 
-<div class="field">
-<label>Product Code</label>
-<input id="productCodeInput" placeholder="P001">
-</div>
-
-<div class="field">
-<label>Product Name</label>
-<input id="productNameInput" placeholder="Product name">
-</div>
-
-<div class="field">
-<label>Pack Size</label>
-<input id="packSizeInput" placeholder="10's">
-</div>
-
-<div class="field">
-<label>Unit TP</label>
-<input id="productTP" type="number" step="0.01">
-</div>
-
-<div class="field">
-<label>Unit VAT</label>
-<input id="productVAT" type="number" step="0.01">
-</div>
-
-<div class="field">
-<label>Unit RP VAT</label>
-<input id="productRP" type="number" step="0.01">
-</div>
-
-</div>
-
-<div class="form-actions">
-
-<button class="btn btn-primary" onclick="addProduct()">
-Add Product
-</button>
-
-</div>
-
-</div>
-
-<div class="panel">
-
-<input class="search"
-id="productSearch"
-placeholder="Search product..."
-oninput="renderProducts()">
-
-<div class="table-wrap">
-
-<table>
-
-<thead>
-<tr>
-<th>Code</th>
-<th>Product</th>
-<th>Pack</th>
-<th>TP</th>
-<th>VAT</th>
-<th>RP VAT</th>
-<th>Action</th>
-</tr>
-</thead>
-
-<tbody id="productTable"></tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- NEW INVOICE -->
-
-<div id="invoice" class="page">
-
-<div class="panel">
-
-<h2>New Invoice</h2>
-
-<div class="invoice-header">
-
-<div class="info">
-<small>Invoice No.</small>
-<strong id="newInvoiceNo">SYL000001</strong>
-</div>
-
-<div class="info">
-<small>Order No.</small>
-<strong id="newOrderNo">000001</strong>
-</div>
-
-<div class="info">
-<small>Date</small>
-<strong id="invoiceDate"></strong>
-</div>
-
-<div class="info">
-<small>Representative</small>
-<select id="invoiceRep" onchange="filterInvoiceCustomers()"></select>
-</div>
-
-</div>
-
-<div class="field" style="margin-bottom:20px">
-<label>Customer</label>
-<select id="invoiceCustomer"></select>
-</div>
-
-
-<h3>Add Product</h3>
-
-<div class="grid">
-
-<div class="field">
-<label>Product</label>
-<select id="invoiceProduct"></select>
-</div>
+        <p id="login-error"></p>
 
-<div class="field">
-<label>Quantity</label>
-<input id="invoiceQty" type="number" value="1" min="1">
-</div>
-
-<div class="field">
-<label>Bonus Quantity</label>
-<input id="invoiceBonus" type="number" value="0" min="0">
-</div>
-
-</div>
-
-<div class="form-actions">
-
-<button class="btn btn-primary" onclick="addInvoiceItem()">
-Add Product
-</button>
-
-</div>
-
-</div>
-
-
-<div class="panel">
-
-<h2>Invoice Items</h2>
-
-<div class="table-wrap">
-
-<table>
-
-<thead>
-
-<tr>
-<th>Code</th>
-<th>Product</th>
-<th>Pack</th>
-<th>Qty</th>
-<th>Bonus</th>
-<th>TP</th>
-<th>VAT</th>
-<th>Total</th>
-<th>Action</th>
-</tr>
-
-</thead>
-
-<tbody id="invoiceItems"></tbody>
-
-</table>
-
-</div>
-
-
-<div class="invoice-total">
-
-<div class="total-box">
-
-<div class="total-row">
-<span>Total TP</span>
-<strong id="totalTP">0.00</strong>
-</div>
+    </div>
 
-<div class="total-row">
-<span>Total VAT</span>
-<strong id="totalVAT">0.00</strong>
 </div>
 
-<div class="total-row grand">
-<span>Grand Total</span>
-<strong id="grandTotal">0.00</strong>
-</div>
-
-</div>
-
-</div>
-
-
-<div class="form-actions">
-
-<button class="btn btn-primary"
-onclick="saveInvoice()">
-Save Invoice
-</button>
-
-<button class="btn btn-secondary"
-onclick="clearInvoice()">
-Clear
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- HISTORY -->
 
-<div id="history" class="page">
+<!-- APPLICATION -->
+<div id="app-page">
 
-<div class="panel">
+    <header>
 
-<div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap">
+        <h2>KIMS</h2>
 
-<div>
-<h2>Invoice History</h2>
-<p style="color:#6b7280">
-Saved invoices
-</p>
-</div>
-
-<input
-style="max-width:350px"
-id="historySearch"
-placeholder="Search invoice..."
-oninput="renderHistory()">
-
-</div>
+        <button
+            class="logout"
+            onclick="logout()"
+        >
+            Logout
+        </button>
 
-</div>
+    </header>
 
 
-<div class="panel">
+    <div class="dashboard">
 
-<div class="table-wrap">
+        <h1>Dashboard</h1>
 
-<table>
+        <p>
+            Welcome to Kemiko Invoice Management System.
+        </p>
 
-<thead>
+        <div class="cards">
 
-<tr>
-<th>Invoice No.</th>
-<th>Order No.</th>
-<th>Date</th>
-<th>Representative</th>
-<th>Customer</th>
-<th>Grand Total</th>
-<th>Action</th>
-</tr>
+            <div class="card">
+                <h3>Representatives</h3>
+                <p>Manage representatives</p>
+            </div>
 
-</thead>
+            <div class="card">
+                <h3>Customers</h3>
+                <p>Manage customers</p>
+            </div>
 
-<tbody id="historyTable"></tbody>
+            <div class="card">
+                <h3>Products</h3>
+                <p>Manage products</p>
+            </div>
 
-</table>
+            <div class="card">
+                <h3>Invoices</h3>
+                <p>Create and manage invoices</p>
+            </div>
 
-</div>
+        </div>
 
-</div>
+    </div>
 
 </div>
 
-
-</section>
-
-</main>
-
-</div>
 
+<script src="app.js"></script>
 
 <script>
 
-let representatives =
-JSON.parse(localStorage.getItem("kims_representatives") || "[]");
+async function handleLogin() {
 
-let customers =
-JSON.parse(localStorage.getItem("kims_customers") || "[]");
+    const email =
+        document.getElementById("email").value.trim();
 
-let products =
-JSON.parse(localStorage.getItem("kims_products") || "[]");
+    const password =
+        document.getElementById("password").value;
 
-let invoices =
-JSON.parse(localStorage.getItem("kims_invoices") || "[]");
+    const error =
+        document.getElementById("login-error");
 
-let invoiceItems=[];
+    error.textContent = "";
 
+    if (!email || !password) {
 
-function saveData(){
+        error.textContent =
+            "Please enter email and password.";
 
-localStorage.setItem(
-"kims_representatives",
-JSON.stringify(representatives)
-);
+        return;
+    }
 
-localStorage.setItem(
-"kims_customers",
-JSON.stringify(customers)
-);
+    const success =
+        await login(email, password);
 
-localStorage.setItem(
-"kims_products",
-JSON.stringify(products)
-);
+    if (!success) {
 
-localStorage.setItem(
-"kims_invoices",
-JSON.stringify(invoices)
-);
+        error.textContent =
+            "Login failed.";
 
+    }
 }
-
-
-function showPage(page,element){
-
-document.querySelectorAll(".page")
-.forEach(p=>p.classList.remove("active"));
-
-document.getElementById(page)
-.classList.add("active");
-
-document.querySelectorAll(".nav-item")
-.forEach(n=>n.classList.remove("active"));
-
-if(element) element.classList.add("active");
-
-let titles={
-dashboard:["Dashboard","Kemiko Invoice Management System"],
-representatives:["Representatives","Manage sales representatives"],
-customers:["Customers","Manage customers"],
-products:["Products","Manage products"],
-invoice:["New Invoice","Create a new invoice"],
-history:["Invoice History","View saved invoices"]
-};
-
-document.getElementById("pageTitle").textContent=titles[page][0];
-document.getElementById("pageSubtitle").textContent=titles[page][1];
-
-if(page==="invoice") initializeInvoice();
-
-}
-
-
-function updateDashboard(){
-
-document.getElementById("repCount").textContent=representatives.length;
-document.getElementById("customerCount").textContent=customers.length;
-document.getElementById("productCount").textContent=products.length;
-document.getElementById("invoiceCount").textContent=invoices.length;
-
-}
-
-
-function addRepresentative(){
-
-let code=document.getElementById("repCode").value.trim();
-let name=document.getElementById("repName").value.trim();
-
-if(!code || !name){
-alert("Enter representative code and name.");
-return;
-}
-
-representatives.push({
-id:Date.now(),
-rep_code:code,
-rep_name:name,
-territory_code:document.getElementById("territoryCode").value.trim(),
-territory_name:document.getElementById("territoryName").value.trim()
-});
-
-saveData();
-renderRepresentatives();
-updateDashboard();
-
-document.getElementById("repCode").value="";
-document.getElementById("repName").value="";
-document.getElementById("territoryCode").value="";
-document.getElementById("territoryName").value="";
-
-}
-
-
-function deleteRepresentative(id){
-
-if(!confirm("Delete this representative?")) return;
-
-representatives=representatives.filter(r=>r.id!==id);
-
-saveData();
-renderRepresentatives();
-updateDashboard();
-
-}
-
-
-function renderRepresentatives(){
-
-let html="";
-
-representatives.forEach(r=>{
-
-html+=`
-<tr>
-<td>${r.rep_code}</td>
-<td>${r.rep_name}</td>
-<td>${r.territory_code||""}</td>
-<td>${r.territory_name||""}</td>
-<td>
-<button class="btn btn-danger"
-onclick="deleteRepresentative(${r.id})">
-Delete
-</button>
-</td>
-</tr>
-`;
-
-});
-
-document.getElementById("repTable").innerHTML=
-html || `<tr><td colspan="5" class="empty">No representatives yet.</td></tr>`;
-
-updateRepSelectors();
-
-}
-
-
-function updateRepSelectors(){
-
-let options=`<option value="">Select Representative</option>`;
-
-representatives.forEach(r=>{
-options+=`
-<option value="${r.id}">
-${r.rep_code} - ${r.rep_name}
-</option>`;
-});
-
-document.getElementById("customerRep").innerHTML=options;
-document.getElementById("invoiceRep").innerHTML=options;
-
-filterInvoiceCustomers();
-
-}
-
-
-function addCustomer(){
-
-let code=document.getElementById("customerCode").value.trim();
-let shop=document.getElementById("shopName").value.trim();
-
-if(!code || !shop){
-alert("Enter customer code and shop name.");
-return;
-}
-
-customers.push({
-
-id:Date.now(),
-customer_code:code,
-shop_name:shop,
-address:document.getElementById("customerAddress").value.trim(),
-owner_name:document.getElementById("ownerName").value.trim(),
-mobile:document.getElementById("customerMobile").value.trim(),
-representative_id:Number(
-document.getElementById("customerRep").value
-)||null
-
-});
-
-saveData();
-renderCustomers();
-updateDashboard();
-
-["customerCode","shopName","customerAddress",
-"ownerName","customerMobile"]
-.forEach(id=>document.getElementById(id).value="");
-
-}
-
-
-function deleteCustomer(id){
-
-if(!confirm("Delete this customer?")) return;
-
-customers=customers.filter(c=>c.id!==id);
-
-saveData();
-renderCustomers();
-updateDashboard();
-
-}
-
-
-function renderCustomers(){
-
-let search=
-(document.getElementById("customerSearch")?.value||"")
-.toLowerCase();
-
-let html="";
-
-customers
-.filter(c=>
-(c.customer_code||"").toLowerCase().includes(search) ||
-(c.shop_name||"").toLowerCase().includes(search) ||
-(c.mobile||"").toLowerCase().includes(search)
-)
-.forEach(c=>{
-
-let rep=representatives.find(
-r=>r.id===c.representative_id
-);
-
-html+=`
-<tr>
-<td>${c.customer_code}</td>
-<td>${c.shop_name}</td>
-<td>${c.address||""}</td>
-<td>${c.owner_name||""}</td>
-<td>${c.mobile||""}</td>
-<td>${rep ? rep.rep_code+" - "+rep.rep_name : ""}</td>
-<td>
-<button class="btn btn-danger"
-onclick="deleteCustomer(${c.id})">
-Delete
-</button>
-</td>
-</tr>
-`;
-
-});
-
-document.getElementById("customerTable").innerHTML=
-html || `<tr><td colspan="7" class="empty">No customers found.</td></tr>`;
-
-}
-
-
-function addProduct(){
-
-let code=document.getElementById("productCodeInput").value.trim();
-let name=document.getElementById("productNameInput").value.trim();
-
-if(!code || !name){
-alert("Enter product code and name.");
-return;
-}
-
-products.push({
-
-id:Date.now(),
-product_code:code,
-product_name:name,
-pack_size:document.getElementById("packSizeInput").value.trim(),
-unit_tp:Number(document.getElementById("productTP").value)||0,
-unit_vat:Number(document.getElementById("productVAT").value)||0,
-unit_rp_vat:Number(document.getElementById("productRP").value)||0
-
-});
-
-saveData();
-renderProducts();
-updateDashboard();
-
-["productCodeInput","productNameInput","packSizeInput",
-"productTP","productVAT","productRP"]
-.forEach(id=>document.getElementById(id).value="");
-
-}
-
-
-function deleteProduct(id){
-
-if(!confirm("Delete this product?")) return;
-
-products=products.filter(p=>p.id!==id);
-
-saveData();
-renderProducts();
-updateDashboard();
-
-}
-
-
-function renderProducts(){
-
-let search=
-(document.getElementById("productSearch")?.value||"")
-.toLowerCase();
-
-let html="";
-
-products
-.filter(p=>
-(p.product_code||"").toLowerCase().includes(search) ||
-(p.product_name||"").toLowerCase().includes(search)
-)
-.sort((a,b)=>
-a.product_name.localeCompare(b.product_name)
-)
-.forEach(p=>{
-
-html+=`
-<tr>
-<td>${p.product_code}</td>
-<td>${p.product_name}</td>
-<td>${p.pack_size||""}</td>
-<td>${Number(p.unit_tp).toFixed(2)}</td>
-<td>${Number(p.unit_vat).toFixed(2)}</td>
-<td>${Number(p.unit_rp_vat).toFixed(2)}</td>
-<td>
-<button class="btn btn-danger"
-onclick="deleteProduct(${p.id})">
-Delete
-</button>
-</td>
-</tr>
-`;
-
-});
-
-document.getElementById("productTable").innerHTML=
-html || `<tr><td colspan="7" class="empty">No products found.</td></tr>`;
-
-}
-
-
-function initializeInvoice(){
-
-invoiceItems=[];
-
-let nextInvoice=
-invoices.length+1;
-
-document.getElementById("newInvoiceNo").textContent=
-"SYL"+String(nextInvoice).padStart(6,"0");
-
-document.getElementById("newOrderNo").textContent=
-String(nextInvoice).padStart(6,"0");
-
-document.getElementById("invoiceDate").textContent=
-new Date().toISOString().slice(0,10);
-
-updateRepSelectors();
-updateInvoiceProducts();
-renderInvoiceItems();
-
-}
-
-
-function filterInvoiceCustomers(){
-
-let repId=
-Number(document.getElementById("invoiceRep").value)||null;
-
-let select=document.getElementById("invoiceCustomer");
-
-let options=
-`<option value="">Select Customer</option>`;
-
-customers
-.filter(c=>!repId || c.representative_id===repId)
-.forEach(c=>{
-options+=`
-<option value="${c.id}">
-${c.customer_code} - ${c.shop_name}
-</option>`;
-});
-
-select.innerHTML=options;
-
-}
-
-
-function updateInvoiceProducts(){
-
-let select=document.getElementById("invoiceProduct");
-
-let options=
-`<option value="">Select Product</option>`;
-
-products
-.sort((a,b)=>
-a.product_name.localeCompare(b.product_name)
-)
-.forEach(p=>{
-options+=`
-<option value="${p.id}">
-${p.product_code} - ${p.product_name}
-</option>`;
-});
-
-select.innerHTML=options;
-
-}
-
-
-function addInvoiceItem(){
-
-let productId=
-Number(document.getElementById("invoiceProduct").value);
-
-let qty=
-Number(document.getElementById("invoiceQty").value)||0;
-
-let bonus=
-Number(document.getElementById("invoiceBonus").value)||0;
-
-let product=
-products.find(p=>p.id===productId);
-
-if(!product){
-alert("Select a product.");
-return;
-}
-
-if(qty<=0){
-alert("Quantity must be greater than zero.");
-return;
-}
-
-let existing=
-invoiceItems.find(i=>i.product_id===productId);
-
-if(existing){
-
-existing.qty+=qty;
-existing.bonus+=bonus;
-
-}else{
-
-invoiceItems.push({
-product_id:productId,
-qty:qty,
-bonus:bonus,
-tp:Number(product.unit_tp)||0,
-vat:Number(product.unit_vat)||0
-});
-
-}
-
-renderInvoiceItems();
-
-document.getElementById("invoiceQty").value=1;
-document.getElementById("invoiceBonus").value=0;
-
-}
-
-
-function removeInvoiceItem(index){
-
-invoiceItems.splice(index,1);
-renderInvoiceItems();
-
-}
-
-
-function renderInvoiceItems(){
-
-let html="";
-let totalTP=0;
-let totalVAT=0;
-let grand=0;
-
-invoiceItems.forEach((item,index)=>{
-
-let product=
-products.find(p=>p.id===item.product_id);
-
-if(!product) return;
-
-let lineTP=item.qty*item.tp;
-let lineVAT=item.qty*item.vat;
-let lineTotal=lineTP+lineVAT;
-
-totalTP+=lineTP;
-totalVAT+=lineVAT;
-grand+=lineTotal;
-
-html+=`
-<tr>
-
-<td>${product.product_code}</td>
-<td>${product.product_name}</td>
-<td>${product.pack_size||""}</td>
-<td>${item.qty}</td>
-<td>${item.bonus}</td>
-<td>${item.tp.toFixed(2)}</td>
-<td>${item.vat.toFixed(2)}</td>
-<td>${lineTotal.toFixed(2)}</td>
-
-<td>
-<button class="btn btn-danger"
-onclick="removeInvoiceItem(${index})">
-Delete
-</button>
-</td>
-
-</tr>
-`;
-
-});
-
-document.getElementById("invoiceItems").innerHTML=
-html || `<tr><td colspan="9" class="empty">No products added.</td></tr>`;
-
-document.getElementById("totalTP").textContent=
-totalTP.toFixed(2);
-
-document.getElementById("totalVAT").textContent=
-totalVAT.toFixed(2);
-
-document.getElementById("grandTotal").textContent=
-grand.toFixed(2);
-
-}
-
-
-function saveInvoice(){
-
-let repId=
-Number(document.getElementById("invoiceRep").value);
-
-let customerId=
-Number(document.getElementById("invoiceCustomer").value);
-
-if(!repId){
-alert("Select representative.");
-return;
-}
-
-if(!customerId){
-alert("Select customer.");
-return;
-}
-
-if(invoiceItems.length===0){
-alert("Add at least one product.");
-return;
-}
-
-let grand=
-invoiceItems.reduce(
-(sum,item)=>
-sum+(item.qty*item.tp)+(item.qty*item.vat),
-0
-);
-
-let invoiceNo=
-document.getElementById("newInvoiceNo").textContent;
-
-let orderNo=
-document.getElementById("newOrderNo").textContent;
-
-invoices.push({
-
-id:Date.now(),
-invoice_no:invoiceNo,
-order_no:orderNo,
-invoice_date:new Date().toISOString().slice(0,10),
-representative_id:repId,
-customer_id:customerId,
-grand_total:grand,
-items:JSON.parse(JSON.stringify(invoiceItems))
-
-});
-
-saveData();
-updateDashboard();
-renderHistory();
-
-alert(
-"Invoice "+invoiceNo+" saved successfully."
-);
-
-clearInvoice();
-
-}
-
-
-function clearInvoice(){
-
-invoiceItems=[];
-renderInvoiceItems();
-initializeInvoice();
-
-}
-
-
-function renderHistory(){
-
-let search=
-(document.getElementById("historySearch")?.value||"")
-.toLowerCase();
-
-let html="";
-
-invoices
-.filter(i=>
-(i.invoice_no||"").toLowerCase().includes(search) ||
-(i.order_no||"").toLowerCase().includes(search)
-)
-.slice()
-.reverse()
-.forEach(i=>{
-
-let rep=
-representatives.find(
-r=>r.id===i.representative_id
-);
-
-let customer=
-customers.find(
-c=>c.id===i.customer_id
-);
-
-html+=`
-<tr>
-
-<td><strong>${i.invoice_no}</strong></td>
-
-<td>${i.order_no}</td>
-
-<td>${i.invoice_date}</td>
-
-<td>
-${rep ? rep.rep_code+" - "+rep.rep_name : ""}
-</td>
-
-<td>
-${customer ? customer.customer_code+" - "+customer.shop_name : ""}
-</td>
-
-<td>
-<strong>${Number(i.grand_total).toFixed(2)}</strong>
-</td>
-
-<td class="actions">
-
-<button class="btn btn-warning"
-onclick="viewInvoice(${i.id})">
-View
-</button>
-
-<button class="btn btn-danger"
-onclick="deleteInvoice(${i.id})">
-Delete
-</button>
-
-</td>
-
-</tr>
-`;
-
-});
-
-document.getElementById("historyTable").innerHTML=
-html || `<tr><td colspan="7" class="empty">No invoices found.</td></tr>`;
-
-}
-
-
-function deleteInvoice(id){
-
-if(!confirm("Delete this invoice?")) return;
-
-invoices=invoices.filter(i=>i.id!==id);
-
-saveData();
-renderHistory();
-updateDashboard();
-
-}
-
-
-function viewInvoice(id){
-
-let invoice=invoices.find(i=>i.id===id);
-
-if(!invoice) return;
-
-let rep=
-representatives.find(
-r=>r.id===invoice.representative_id
-);
-
-let customer=
-customers.find(
-c=>c.id===invoice.customer_id
-);
-
-let text=
-"Invoice: "+invoice.invoice_no+
-"\nOrder: "+invoice.order_no+
-"\nDate: "+invoice.invoice_date+
-"\nRepresentative: "+
-(rep ? rep.rep_name : "")+
-"\nCustomer: "+
-(customer ? customer.shop_name : "")+
-"\nGrand Total: "+
-Number(invoice.grand_total).toFixed(2);
-
-alert(text);
-
-}
-
-
-document.getElementById("invoiceDate").textContent=
-new Date().toISOString().slice(0,10);
-
-renderRepresentatives();
-renderCustomers();
-renderProducts();
-renderHistory();
-updateDashboard();
 
 </script>
 
